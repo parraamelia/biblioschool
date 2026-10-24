@@ -1,6 +1,8 @@
 
 ---
 import Layout from "../layouts/Layout.astro";
+
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout titulo="BiblioSchool | Biblioteca Escolar">
@@ -21,11 +23,11 @@ import Layout from "../layouts/Layout.astro";
         </p>
 
         <div class="acciones">
-          <a href="/catalogo" class="boton principal">
+          <a href={`${base}catalogo/`} class="boton principal">
             Explorar catálogo <span aria-hidden="true">→</span>
           </a>
 
-          <a href="/login" class="boton secundario">
+          <a href={`${base}login/`} class="boton secundario">
             Iniciar sesión
           </a>
         </div>
@@ -56,7 +58,7 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <section class="servicios">
-      <a href="/catalogo" class="servicio">
+      <a href={`${base}catalogo/`} class="servicio">
         <span class="numero">01</span>
         <div>
           <h3>Catálogo de libros</h3>
@@ -65,7 +67,7 @@ import Layout from "../layouts/Layout.astro";
         <span class="flecha" aria-hidden="true">↗</span>
       </a>
 
-      <a href="/catalogo" class="servicio">
+      <a href={`${base}catalogo/`} class="servicio">
         <span class="numero">02</span>
         <div>
           <h3>Búsqueda por categorías</h3>
@@ -74,7 +76,7 @@ import Layout from "../layouts/Layout.astro";
         <span class="flecha" aria-hidden="true">↗</span>
       </a>
 
-      <a href="/login" class="servicio">
+      <a href={`${base}login/`} class="servicio">
         <span class="numero">03</span>
         <div>
           <h3>Tu cuenta</h3>
@@ -85,9 +87,9 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <footer class="pie">
-      <a href="/" class="pie-marca">BiblioSchool</a>
+      <a href={base} class="pie-marca">BiblioSchool</a>
       <p>Una biblioteca para nuestra comunidad educativa.</p>
-      <a href="/catalogo">Consultar catálogo →</a>
+      <a href={`${base}catalogo/`}>Consultar catálogo →</a>
     </footer>
   </main>
 </Layout>
@@ -99,7 +101,6 @@ import Layout from "../layouts/Layout.astro";
     --fondo: #f6f3ec;
     --texto: #30342f;
     --linea: #dcd8cd;
-
     background: var(--fondo);
     color: var(--texto);
   }
