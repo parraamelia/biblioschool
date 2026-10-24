@@ -1,22 +1,24 @@
+
+---
+const base = import.meta.env.BASE_URL;
+const inicio = base;
+const catalogo = `${base}catalogo`;
+const login = `${base}login`;
+const registro = `${base}registro`;
 ---
 
 <header class="navbar">
   <div class="contenedor">
-
-    <a href="/" class="logo">
+    <a href={inicio} class="logo">
       Biblio<span>School</span>
     </a>
 
     <nav>
-      <a href="/" class="enlace">Inicio</a>
-      <a href="/catalogo" class="enlace">Catálogo</a>
-      <a href="/login" class="enlace">Iniciar sesión</a>
-
-      <a href="/registro" class="registro">
-        Registrarse
-      </a>
+      <a href={inicio} class="enlace">Inicio</a>
+      <a href={catalogo} class="enlace">Catálogo</a>
+      <a href={login} class="enlace">Iniciar sesión</a>
+      <a href={registro} class="registro">Registrarse</a>
     </nav>
-
   </div>
 </header>
 
@@ -33,7 +35,6 @@
     width: min(1200px, 100%);
     margin: 0 auto;
     padding: 20px 40px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -89,19 +90,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     min-height: 40px;
     padding: 0 17px;
-
     border: 1px solid #293e33;
     color: #293e33;
-
     font-size: 12px;
     font-weight: 600;
-
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .registro:hover {
