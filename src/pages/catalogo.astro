@@ -1,0 +1,845 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const libros = [
+  {
+    id: 1,
+    titulo: "Cien años de soledad",
+    autor: "Gabriel García Márquez",
+    categoria: "Literatura",
+    anio: 1967
+  },
+  {
+    id: 2,
+    titulo: "Don Quijote de la Mancha",
+    autor: "Miguel de Cervantes",
+    categoria: "Clásicos",
+    anio: 1605
+  },
+  {
+    id: 3,
+    titulo: "La Odisea",
+    autor: "Homero",
+    categoria: "Literatura clásica",
+    anio: 700
+  },
+  {
+    id: 4,
+    titulo: "El principito",
+    autor: "Antoine de Saint-Exupéry",
+    categoria: "Literatura juvenil",
+    anio: 1943
+  },
+  {
+    id: 5,
+    titulo: "Don Juan Tenorio",
+    autor: "José Zorrilla",
+    categoria: "Teatro",
+    anio: 1844
+  },
+  {
+    id: 6,
+    titulo: "La casa de los espíritus",
+    autor: "Isabel Allende",
+    categoria: "Literatura",
+    anio: 1982
+  }
+];
+---
+
+<Layout titulo="Catálogo | BiblioSchool">
+
+  <main class="catalogo">
+
+    <section class="encabezado">
+
+      <div class="encabezado-contenido">
+        <p class="etiqueta">BIBLIOTECA ESCOLAR / CATÁLOGO</p>
+
+        <h1>Una colección<br />para descubrir.</h1>
+
+        <p class="descripcion">
+          Explora los libros disponibles en nuestra biblioteca.
+          Puedes buscar por título o autor y filtrar las obras
+          según su categoría.
+        </p>
+      </div>
+
+      <div class="numero-coleccion">
+        <span>06</span>
+        <small>LIBROS<br />DISPONIBLES</small>
+      </div>
+
+    </section>
+
+
+    <section class="contenido">
+
+      <div class="herramientas">
+
+        <div class="busqueda">
+          <label for="buscador">Buscar</label>
+
+          <input
+            id="buscador"
+            type="text"
+            placeholder="Título o autor"
+            aria-label="Buscar libros por título o autor"
+          />
+        </div>
+
+        <div class="filtro">
+          <label for="filtro">Categoría</label>
+
+          <select
+            id="filtro"
+            aria-label="Filtrar por categoría"
+          >
+            <option value="">Todas las categorías</option>
+            <option value="literatura">Literatura</option>
+            <option value="clasicos">Clásicos</option>
+            <option value="teatro">Teatro</option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="barra-resultados">
+        <p id="contador" aria-live="polite">
+          Mostrando 6 libros
+        </p>
+
+        <span>COLECCIÓN BIBLIOSCHOOL</span>
+      </div>
+
+
+      <section class="libros" id="lista-libros">
+
+        {
+          libros.map((libro) => (
+            <article
+              class="libro"
+              data-titulo={libro.titulo
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()}
+              data-autor={libro.autor
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()}
+              data-categoria={libro.categoria
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()}
+            >
+
+              <div class="portada">
+                <div class="portada-superior">
+                  <span>BIBLIOSCHOOL</span>
+                  <span>{String(libro.id).padStart(2, "0")}</span>
+                </div>
+
+                <div class="portada-centro">
+                  <span class="tipo">COLECCIÓN</span>
+                  <strong>{libro.titulo}</strong>
+                  <span class="autor-portada">{libro.autor}</span>
+                </div>
+
+                <div class="portada-inferior">
+                  <span>{libro.categoria}</span>
+                  <span>{libro.anio}</span>
+                </div>
+              </div>
+
+
+              <div class="informacion">
+
+                <div class="categoria">
+                  {libro.categoria}
+                </div>
+
+                <h2>{libro.titulo}</h2>
+
+                <p class="autor">
+                  {libro.autor}
+                </p>
+
+                <div class="separador"></div>
+
+                <div class="detalle">
+                  <span>AÑO</span>
+                  <strong>{libro.anio}</strong>
+                </div>
+
+                <a
+                  href={`/libro/${libro.id}`}
+                  class="boton"
+                >
+                  Ver información
+                  <span aria-hidden="true">→</span>
+                </a>
+
+              </div>
+
+            </article>
+          ))
+        }
+
+      </section>
+
+
+      <div
+        id="sin-resultados"
+        class="sin-resultados"
+        hidden
+      >
+        <span class="sin-resultados-numero">—</span>
+
+        <h2>No encontramos ese libro.</h2>
+
+        <p>
+          Prueba con otro título, autor o categoría.
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+</Layout>
+
+
+<script>
+  const buscador =
+    document.querySelector<HTMLInputElement>("#buscador");
+
+  const filtro =
+    document.querySelector<HTMLSelectElement>("#filtro");
+
+  const tarjetas =
+    document.querySelectorAll<HTMLElement>(".libro");
+
+  const contador =
+    document.querySelector<HTMLElement>("#contador");
+
+  const sinResultados =
+    document.querySelector<HTMLElement>("#sin-resultados");
+
+
+  function normalizar(texto: string): string {
+    return texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
+
+  function filtrarLibros() {
+
+    if (
+      !buscador ||
+      !filtro ||
+      !contador ||
+      !sinResultados
+    ) {
+      return;
+    }
+
+    const texto =
+      normalizar(buscador.value);
+
+    const categoriaSeleccionada =
+      filtro.value;
+
+    let cantidadVisible = 0;
+
+
+    tarjetas.forEach((tarjeta) => {
+
+      const titulo =
+        tarjeta.dataset.titulo || "";
+
+      const autor =
+        tarjeta.dataset.autor || "";
+
+      const categoria =
+        tarjeta.dataset.categoria || "";
+
+
+      const coincideTexto =
+        titulo.includes(texto) ||
+        autor.includes(texto);
+
+
+      let coincideCategoria = true;
+
+
+      if (categoriaSeleccionada === "literatura") {
+
+        coincideCategoria =
+          categoria.includes("literatura");
+
+      } else if (categoriaSeleccionada === "clasicos") {
+
+        coincideCategoria =
+          categoria === "clasicos" ||
+          categoria === "literatura clasica";
+
+      } else if (categoriaSeleccionada === "teatro") {
+
+        coincideCategoria =
+          categoria === "teatro";
+      }
+
+
+      const mostrar =
+        coincideTexto &&
+        coincideCategoria;
+
+
+      tarjeta.hidden = !mostrar;
+
+
+      if (mostrar) {
+        cantidadVisible++;
+      }
+
+    });
+
+
+    contador.textContent =
+      `Mostrando ${cantidadVisible} de ${tarjetas.length} libros`;
+
+    sinResultados.hidden =
+      cantidadVisible !== 0;
+  }
+
+
+  buscador?.addEventListener(
+    "input",
+    filtrarLibros
+  );
+
+  filtro?.addEventListener(
+    "change",
+    filtrarLibros
+  );
+</script>
+
+
+<style>
+
+  .catalogo {
+    min-height: 100vh;
+    background: #f6f3ec;
+    color: #30342f;
+  }
+
+
+  /* ENCABEZADO */
+
+  .encabezado {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 50px;
+
+    min-height: 430px;
+    padding: 70px 10% 65px;
+
+    background: #293e33;
+    color: #f6f3ec;
+  }
+
+
+  .encabezado-contenido {
+    max-width: 700px;
+  }
+
+
+  .etiqueta {
+    margin-bottom: 25px;
+
+    color: #b9c4b7;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+
+  .encabezado h1 {
+    margin: 0 0 25px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(44px, 6vw, 75px);
+    font-weight: 400;
+    letter-spacing: -2px;
+    line-height: 1.03;
+  }
+
+
+  .descripcion {
+    max-width: 520px;
+
+    color: #d5dbd2;
+
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+
+  .numero-coleccion {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+
+    color: #b7c3b6;
+  }
+
+
+  .numero-coleccion span {
+    color: #f6f3ec;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 70px;
+    font-weight: 400;
+    line-height: 0.8;
+  }
+
+
+  .numero-coleccion small {
+    padding-bottom: 3px;
+
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    line-height: 1.5;
+  }
+
+
+  /* CONTENIDO */
+
+  .contenido {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 55px 7% 80px;
+  }
+
+
+  /* BUSCADOR */
+
+  .herramientas {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 30px;
+
+    margin-bottom: 35px;
+  }
+
+
+  .busqueda,
+  .filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+
+  .herramientas label {
+    color: #687066;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+
+  .herramientas input,
+  .herramientas select {
+
+    width: 100%;
+    height: 48px;
+
+    border: none;
+    border-bottom: 1px solid #bbb9ae;
+
+    border-radius: 0;
+
+    background: transparent;
+
+    color: #30342f;
+
+    font-size: 14px;
+
+    outline: none;
+  }
+
+
+  .herramientas input::placeholder {
+    color: #999a92;
+  }
+
+
+  .herramientas input:focus,
+  .herramientas select:focus {
+    border-bottom-color: #293e33;
+  }
+
+
+  /* BARRA DE RESULTADOS */
+
+  .barra-resultados {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid #dcd8cd;
+  }
+
+
+  .barra-resultados p {
+    color: #555b54;
+    font-size: 12px;
+  }
+
+
+  .barra-resultados span {
+    color: #8a8b83;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+  }
+
+
+  /* LIBROS */
+
+  .libros {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 45px 30px;
+  }
+
+
+  .libro {
+    min-width: 0;
+  }
+
+
+  .libro[hidden] {
+    display: none;
+  }
+
+
+  /* PORTADA */
+
+  .portada {
+    position: relative;
+
+    height: 310px;
+
+    padding: 18px 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    overflow: hidden;
+
+    background:
+      linear-gradient(
+        135deg,
+        #d9ddd3,
+        #aeb8a9
+      );
+
+    color: #293e33;
+  }
+
+
+  .libro:nth-child(2n) .portada {
+    background:
+      linear-gradient(
+        135deg,
+        #ddd7ca,
+        #b8ae9d
+      );
+  }
+
+
+  .libro:nth-child(3n) .portada {
+    background:
+      linear-gradient(
+        135deg,
+        #d5dcd8,
+        #a9b7b1
+      );
+  }
+
+
+  .portada-superior,
+  .portada-inferior {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+  }
+
+
+  .portada-centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 20px;
+    text-align: center;
+  }
+
+
+  .portada-centro .tipo {
+    margin-bottom: 18px;
+
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+
+  .portada-centro strong {
+    max-width: 230px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 29px;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+
+  .autor-portada {
+    margin-top: 15px;
+
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+
+  /* INFORMACIÓN */
+
+  .informacion {
+    padding: 22px 3px 0;
+  }
+
+
+  .categoria {
+    color: #657568;
+
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+  }
+
+
+  .informacion h2 {
+    margin: 8px 0 4px;
+
+    color: #293e33;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1.25;
+  }
+
+
+  .autor {
+    color: #65665f;
+
+    font-size: 13px;
+  }
+
+
+  .separador {
+    width: 100%;
+    height: 1px;
+
+    margin: 18px 0 13px;
+
+    background: #dcd8cd;
+  }
+
+
+  .detalle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+  }
+
+
+  .detalle span {
+    color: #8a8b83;
+
+    font-size: 9px;
+    letter-spacing: 1.5px;
+  }
+
+
+  .detalle strong {
+    color: #555b54;
+
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+
+  .boton {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #293e33;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+      gap 0.2s ease,
+      color 0.2s ease;
+  }
+
+
+  .boton:hover {
+    gap: 15px;
+    color: #657568;
+  }
+
+
+  /* SIN RESULTADOS */
+
+  .sin-resultados {
+    padding: 70px 20px;
+
+    border-top: 1px solid #dcd8cd;
+
+    text-align: center;
+  }
+
+
+  .sin-resultados[hidden] {
+    display: none;
+  }
+
+
+  .sin-resultados-numero {
+    display: block;
+
+    margin-bottom: 15px;
+
+    color: #9a9b92;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+  }
+
+
+  .sin-resultados h2 {
+    margin-bottom: 8px;
+
+    color: #293e33;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+    font-weight: 400;
+  }
+
+
+  .sin-resultados p {
+    color: #777970;
+    font-size: 13px;
+  }
+
+
+  /* TABLET */
+
+  @media (max-width: 900px) {
+
+    .encabezado {
+      padding: 60px 7%;
+    }
+
+
+    .libros {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+
+    .contenido {
+      padding-right: 5%;
+      padding-left: 5%;
+    }
+
+  }
+
+
+  /* CELULAR */
+
+  @media (max-width: 650px) {
+
+    .encabezado {
+      flex-direction: column;
+      align-items: flex-start;
+
+      min-height: auto;
+      padding: 55px 7%;
+    }
+
+
+    .encabezado h1 {
+      letter-spacing: -1px;
+    }
+
+
+    .numero-coleccion {
+      margin-top: 25px;
+    }
+
+
+    .numero-coleccion span {
+      font-size: 52px;
+    }
+
+
+    .herramientas {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+
+    .libros {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+
+    .portada {
+      height: 350px;
+    }
+
+
+    .barra-resultados {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+  }
+
+</style>

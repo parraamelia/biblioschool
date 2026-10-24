@@ -1,0 +1,1 @@
+import{t as e}from"./supabase.jd1LqJKx.js";async function t(){let{data:{session:t}}=await e.auth.getSession();t||(window.location.href=`/login`)}t();

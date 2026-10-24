@@ -1,0 +1,27 @@
+
+---
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+
+const {
+  titulo = "BiblioSchool | Biblioteca Escolar",
+  descripcion = "Biblioteca virtual escolar. Explora libros, consulta títulos y descubre nuevas lecturas."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={descripcion} />
+    <meta name="theme-color" content="#f6f3ec" />
+    <title>{titulo}</title>
+  </head>
+
+  <body>
+    <Navbar />
+
+    <slot />
+  </body>
+</html>

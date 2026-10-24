@@ -1,0 +1,597 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout titulo="Crear cuenta | BiblioSchool">
+
+  <main class="registro">
+
+    <section class="presentacion">
+      <p class="etiqueta">BIBLIOSCHOOL / NUEVA CUENTA</p>
+
+      <h1>
+        Forma parte de
+        <span>nuestra biblioteca.</span>
+      </h1>
+
+      <p class="descripcion">
+        Crea tu cuenta para formar parte de BiblioSchool y
+        disfrutar de un espacio pensado para acompañar
+        tu aprendizaje.
+      </p>
+
+      <div class="nota">
+        <span>01</span>
+        <p>
+          Completa tus datos para crear tu espacio personal
+          dentro de la biblioteca escolar.
+        </p>
+      </div>
+
+      <div class="nota segunda">
+        <span>02</span>
+        <p>
+          ¿Ya tienes una cuenta?
+          <a href="/login">Inicia sesión →</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="formulario-seccion">
+
+      <div class="encabezado-formulario">
+        <p class="numero">01 / REGISTRO</p>
+
+        <h2>Crear cuenta</h2>
+
+        <p>
+          Completa la información para comenzar.
+        </p>
+      </div>
+
+      <form id="formulario-registro">
+
+        <div class="campo">
+          <label for="nombre">
+            Nombre completo
+          </label>
+
+          <input
+            type="text"
+            id="nombre"
+            placeholder="Escribe tu nombre completo"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <div class="campo">
+          <label for="usuario">
+            Nombre de usuario
+          </label>
+
+          <input
+            type="text"
+            id="usuario"
+            placeholder="Elige un nombre de usuario"
+            autocomplete="username"
+            required
+          />
+        </div>
+
+        <div class="campo">
+          <label for="correo">
+            Correo electrónico
+          </label>
+
+          <input
+            type="email"
+            id="correo"
+            placeholder="ejemplo@correo.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="campo">
+          <label for="contrasena">
+            Contraseña
+          </label>
+
+          <input
+            type="password"
+            id="contrasena"
+            placeholder="Mínimo 6 caracteres"
+            minlength="6"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+
+        <div class="campo">
+          <label for="confirmar">
+            Confirmar contraseña
+          </label>
+
+          <input
+            type="password"
+            id="confirmar"
+            placeholder="Escribe nuevamente tu contraseña"
+            minlength="6"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+
+        <p
+          id="mensaje"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <button type="submit">
+          Crear mi cuenta
+          <span aria-hidden="true">→</span>
+        </button>
+
+      </form>
+
+      <div class="alternativa">
+        <p>¿Ya tienes una cuenta?</p>
+
+        <a href="/login">
+          Iniciar sesión →
+        </a>
+      </div>
+
+      <a href="/" class="volver">
+        ← Volver al inicio
+      </a>
+
+    </section>
+
+  </main>
+
+</Layout>
+
+<style>
+  .registro {
+    min-height: calc(100vh - 75px);
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    background: #f6f3ec;
+    color: #30342f;
+  }
+
+  .presentacion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 700px;
+    padding: 70px 10%;
+    background: #293e33;
+    color: #f6f3ec;
+  }
+
+  .etiqueta {
+    margin-bottom: 30px;
+    color: #b9c4b7;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .presentacion h1 {
+    max-width: 620px;
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(43px, 5.3vw, 70px);
+    font-weight: 400;
+    letter-spacing: -2px;
+    line-height: 1.05;
+  }
+
+  .presentacion h1 span {
+    display: block;
+    font-style: italic;
+  }
+
+  .descripcion {
+    max-width: 450px;
+    margin-top: 30px;
+    color: #d2d9d0;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .nota {
+    display: grid;
+    grid-template-columns: 45px 1fr;
+    gap: 15px;
+    max-width: 450px;
+    margin-top: 55px;
+    padding-top: 20px;
+    border-top: 1px solid #506456;
+  }
+
+  .nota span {
+    color: #b9c4b7;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+  }
+
+  .nota p {
+    max-width: 340px;
+    color: #bfc8be;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .nota a {
+    display: inline-block;
+    margin-top: 5px;
+    color: #f6f3ec;
+    font-weight: 700;
+  }
+
+  .segunda {
+    margin-top: 25px;
+  }
+
+  .formulario-seccion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 60px 10%;
+  }
+
+  .encabezado-formulario {
+    margin-bottom: 30px;
+  }
+
+  .numero {
+    margin-bottom: 13px;
+    color: #657568;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+  }
+
+  .encabezado-formulario h2 {
+    margin-bottom: 9px;
+    color: #293e33;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 38px;
+    font-weight: 400;
+  }
+
+  .encabezado-formulario > p:last-child {
+    color: #777970;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  form {
+    width: 100%;
+  }
+
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 18px;
+  }
+
+  .campo label {
+    color: #555b54;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  .campo input {
+    width: 100%;
+    height: 45px;
+    padding: 0 2px;
+    border: none;
+    border-bottom: 1px solid #c4c2b8;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+    color: #30342f;
+    font-size: 13px;
+  }
+
+  .campo input::placeholder {
+    color: #aaa9a1;
+  }
+
+  .campo input:focus {
+    border-bottom-color: #293e33;
+  }
+
+  form button {
+    width: 100%;
+    min-height: 49px;
+    margin-top: 5px;
+    border: none;
+    background: #293e33;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    font-size: 12px;
+    font-weight: 600;
+    transition:
+      background 0.2s ease,
+      gap 0.2s ease;
+  }
+
+  form button:hover {
+    background: #405b49;
+    gap: 18px;
+  }
+
+  form button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  #mensaje {
+    min-height: 22px;
+    margin: 8px 0 10px;
+    color: #657568;
+    font-size: 11px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .alternativa {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #dcd8cd;
+  }
+
+  .alternativa p {
+    margin-bottom: 6px;
+    color: #777970;
+    font-size: 11px;
+  }
+
+  .alternativa a {
+    color: #293e33;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .alternativa a:hover {
+    color: #657568;
+  }
+
+  .volver {
+    display: inline-block;
+    margin-top: 25px;
+    color: #777970;
+    font-size: 11px;
+  }
+
+  .volver:hover {
+    color: #293e33;
+  }
+
+  @media (max-width: 850px) {
+    .registro {
+      grid-template-columns: 1fr;
+    }
+
+    .presentacion {
+      min-height: auto;
+      padding: 60px 8%;
+    }
+
+    .nota {
+      margin-top: 40px;
+    }
+
+    .segunda {
+      margin-top: 20px;
+    }
+
+    .formulario-seccion {
+      max-width: 600px;
+      padding: 55px 8%;
+    }
+  }
+
+  @media (max-width: 450px) {
+    .presentacion {
+      padding: 50px 7%;
+    }
+
+    .presentacion h1 {
+      font-size: 44px;
+      letter-spacing: -1.2px;
+    }
+
+    .formulario-seccion {
+      padding: 50px 7%;
+    }
+
+    .encabezado-formulario h2 {
+      font-size: 34px;
+    }
+  }
+</style>
+
+<script>
+  import { supabase } from "../lib/supabase.js";
+
+  function prepararRegistro() {
+    console.log(
+      "BiblioSchool: script de registro cargado"
+    );
+
+    const formulario =
+      document.querySelector("#formulario-registro");
+
+    const mensaje =
+      document.querySelector("#mensaje");
+
+    console.log(
+      "Formulario encontrado:",
+      Boolean(formulario)
+    );
+
+    console.log(
+      "Mensaje encontrado:",
+      Boolean(mensaje)
+    );
+
+    if (!formulario || !mensaje) {
+      console.error(
+        "No se encontró el formulario o el mensaje."
+      );
+      return;
+    }
+
+    formulario.addEventListener(
+      "submit",
+      async (evento) => {
+
+        evento.preventDefault();
+
+        console.log(
+          "BiblioSchool: formulario enviado"
+        );
+
+        const nombre =
+          document.querySelector("#nombre");
+
+        const usuario =
+          document.querySelector("#usuario");
+
+        const correo =
+          document.querySelector("#correo");
+
+        const contrasena =
+          document.querySelector("#contrasena");
+
+        const confirmar =
+          document.querySelector("#confirmar");
+
+        const boton =
+          formulario.querySelector(
+            'button[type="submit"]'
+          );
+
+        if (
+          !nombre ||
+          !usuario ||
+          !correo ||
+          !contrasena ||
+          !confirmar ||
+          !boton
+        ) {
+          mensaje.textContent =
+            "Falta un campo del formulario. Revisa el código.";
+          return;
+        }
+
+        if (
+          contrasena.value !==
+          confirmar.value
+        ) {
+          mensaje.textContent =
+            "Las contraseñas no coinciden.";
+          return;
+        }
+
+        mensaje.textContent =
+          "Conectando con Supabase...";
+
+        boton.disabled = true;
+
+        try {
+
+          const { data, error } =
+            await supabase.auth.signUp({
+              email: correo.value.trim(),
+              password: contrasena.value,
+
+              options: {
+                data: {
+                  nombre_completo:
+                    nombre.value.trim(),
+
+                  nombre_usuario:
+                    usuario.value.trim()
+                },
+
+                emailRedirectTo:
+                  "http://localhost:4321/login"
+              }
+            });
+
+          if (error) {
+
+            console.error(
+              "Supabase respondió:",
+              error
+            );
+
+            mensaje.textContent =
+              "Error de registro: " +
+              error.message;
+
+            return;
+          }
+
+          console.log(
+            "Respuesta de registro recibida:",
+            data
+          );
+
+          mensaje.textContent =
+            data.session
+              ? "¡Cuenta creada correctamente!"
+              : "Registro enviado. Revisa tu correo para confirmar la cuenta.";
+
+        } catch (error) {
+
+          console.error(
+            "Error al conectar:",
+            error
+          );
+
+          mensaje.textContent =
+            "No se pudo conectar con Supabase. Revisa la consola.";
+
+        } finally {
+
+          boton.disabled = false;
+
+        }
+      }
+    );
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      prepararRegistro
+    );
+
+  } else {
+
+    prepararRegistro();
+
+  }
+</script>

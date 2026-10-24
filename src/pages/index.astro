@@ -1,16 +1,360 @@
+
 ---
+import Layout from "../layouts/Layout.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout titulo="BiblioSchool | Biblioteca Escolar">
+  <main class="inicio">
+    <section class="portada">
+      <div class="portada-texto">
+        <p class="sobretitulo">LECTURA · CONOCIMIENTO · CULTURA</p>
+
+        <h1>
+          Un lugar para encontrar
+          <span>tu próximo libro.</span>
+        </h1>
+
+        <p class="descripcion">
+          Explora nuestra colección de libros y materiales educativos.
+          Consulta títulos, descubre autores y encuentra nuevas lecturas
+          en la biblioteca escolar.
+        </p>
+
+        <div class="acciones">
+          <a href="/catalogo" class="boton principal">
+            Explorar catálogo <span aria-hidden="true">→</span>
+          </a>
+
+          <a href="/login" class="boton secundario">
+            Iniciar sesión
+          </a>
+        </div>
+      </div>
+
+      <div class="portada-imagen">
+        <img
+          src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1100&q=85"
+          alt="Estanterías de una biblioteca con libros"
+        />
+        <div class="imagen-pie">
+          <span>01 — NUESTRA BIBLIOTECA</span>
+          <span>Un espacio para aprender</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="introduccion">
+      <div class="introduccion-titulo">
+        <p class="sobretitulo">BIBLIOSCHOOL</p>
+        <h2>El conocimiento, al alcance de todos.</h2>
+      </div>
+
+      <p class="introduccion-texto">
+        Una biblioteca digital pensada para facilitar el acceso a los
+        libros y acompañar el aprendizaje de nuestra comunidad educativa.
+      </p>
+    </section>
+
+    <section class="servicios">
+      <a href="/catalogo" class="servicio">
+        <span class="numero">01</span>
+        <div>
+          <h3>Catálogo de libros</h3>
+          <p>Consulta las obras y los materiales disponibles.</p>
+        </div>
+        <span class="flecha" aria-hidden="true">↗</span>
+      </a>
+
+      <a href="/catalogo" class="servicio">
+        <span class="numero">02</span>
+        <div>
+          <h3>Búsqueda por categorías</h3>
+          <p>Encuentra lecturas según tus intereses y necesidades.</p>
+        </div>
+        <span class="flecha" aria-hidden="true">↗</span>
+      </a>
+
+      <a href="/login" class="servicio">
+        <span class="numero">03</span>
+        <div>
+          <h3>Tu cuenta</h3>
+          <p>Accede a tu espacio personal de la biblioteca.</p>
+        </div>
+        <span class="flecha" aria-hidden="true">↗</span>
+      </a>
+    </section>
+
+    <footer class="pie">
+      <a href="/" class="pie-marca">BiblioSchool</a>
+      <p>Una biblioteca para nuestra comunidad educativa.</p>
+      <a href="/catalogo">Consultar catálogo →</a>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  .inicio {
+    --verde: #293e33;
+    --verde-suave: #657568;
+    --fondo: #f6f3ec;
+    --texto: #30342f;
+    --linea: #dcd8cd;
+
+    background: var(--fondo);
+    color: var(--texto);
+  }
+
+  .portada {
+    display: grid;
+    grid-template-columns: 1fr 0.92fr;
+    gap: 7%;
+    align-items: center;
+    max-width: 1400px;
+    min-height: 610px;
+    margin: 0 auto;
+    padding: 75px 8% 85px;
+  }
+
+  .portada-texto {
+    max-width: 570px;
+  }
+
+  .sobretitulo {
+    color: var(--verde-suave);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    line-height: 1.7;
+  }
+
+  .portada h1 {
+    margin: 25px 0;
+    color: var(--verde);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(42px, 5vw, 68px);
+    font-weight: 400;
+    letter-spacing: -2px;
+    line-height: 1.08;
+  }
+
+  .portada h1 span {
+    display: block;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .descripcion {
+    max-width: 450px;
+    color: #65665f;
+    font-size: 16px;
+    line-height: 1.9;
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 0 20px;
+    font-size: 13px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .principal {
+    background: var(--verde);
+    color: #fff;
+  }
+
+  .principal:hover {
+    background: #405b49;
+  }
+
+  .secundario {
+    border: 1px solid #c9c7bc;
+    color: var(--verde);
+  }
+
+  .secundario:hover {
+    background: #eae6dc;
+  }
+
+  .portada-imagen {
+    min-width: 0;
+  }
+
+  .portada-imagen img {
+    display: block;
+    width: 100%;
+    height: 390px;
+    object-fit: cover;
+  }
+
+  .imagen-pie {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    color: #73756b;
+    font-size: 10px;
+    letter-spacing: 0.6px;
+  }
+
+  .introduccion {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr;
+    align-items: end;
+    gap: 60px;
+    padding: 65px 10%;
+    border-top: 1px solid var(--linea);
+    border-bottom: 1px solid var(--linea);
+    background: #eeebe2;
+  }
+
+  .introduccion h2 {
+    max-width: 480px;
+    margin-top: 15px;
+    color: var(--verde);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 400;
+    line-height: 1.25;
+  }
+
+  .introduccion-texto {
+    max-width: 430px;
+    color: #65665f;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .servicios {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 35px 8% 65px;
+  }
+
+  .servicio {
+    display: grid;
+    grid-template-columns: 55px 1fr 30px;
+    align-items: center;
+    gap: 20px;
+    padding: 26px 0;
+    border-bottom: 1px solid var(--linea);
+    transition: padding 0.2s;
+  }
+
+  .servicio:hover {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .numero {
+    color: var(--verde-suave);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+  }
+
+  .servicio h3 {
+    margin-bottom: 7px;
+    color: var(--verde);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  .servicio p {
+    color: #72736b;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .flecha {
+    color: var(--verde);
+    font-size: 21px;
+  }
+
+  .pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 28px 8%;
+    border-top: 1px solid var(--linea);
+    color: #66685f;
+    font-size: 12px;
+  }
+
+  .pie-marca {
+    color: var(--verde);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+  }
+
+  .pie > a:last-child {
+    color: var(--verde);
+  }
+
+  @media (max-width: 850px) {
+    .portada {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 60px 7%;
+    }
+
+    .portada-imagen img {
+      height: 330px;
+    }
+
+    .introduccion {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 45px 7%;
+    }
+
+    .servicios {
+      padding: 25px 7% 45px;
+    }
+
+    .pie {
+      padding: 25px 7%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .portada h1 {
+      font-size: 43px;
+      letter-spacing: -1.3px;
+    }
+
+    .portada-imagen img {
+      height: 250px;
+    }
+
+    .imagen-pie {
+      flex-direction: column;
+    }
+
+    .servicio {
+      grid-template-columns: 30px 1fr 20px;
+      gap: 12px;
+    }
+
+    .servicio h3 {
+      font-size: 19px;
+    }
+
+    .pie {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

@@ -1,0 +1,435 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout titulo="Iniciar sesión | BiblioSchool">
+
+  <main class="login">
+
+    <section class="presentacion">
+      <p class="etiqueta">BIBLIOSCHOOL / CUENTA</p>
+
+      <h1>
+        Tu biblioteca,
+        <span>siempre contigo.</span>
+      </h1>
+
+      <p class="descripcion">
+        Inicia sesión para acceder a tu espacio dentro de
+        BiblioSchool y continuar explorando nuestra colección.
+      </p>
+
+      <div class="nota">
+        <span>01</span>
+        <p>
+          Una cuenta te permite formar parte de nuestra
+          comunidad educativa.
+        </p>
+      </div>
+    </section>
+
+    <section class="formulario-seccion">
+
+      <div class="encabezado-formulario">
+        <p class="numero">01 / ACCESO</p>
+        <h2>Iniciar sesión</h2>
+        <p>
+          Introduce tus datos para acceder a tu cuenta.
+        </p>
+      </div>
+
+      <form id="formulario-login">
+
+        <div class="campo">
+          <label for="usuario">Correo electrónico</label>
+
+          <input
+            type="email"
+            id="usuario"
+            placeholder="tucorreo@ejemplo.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="campo">
+          <label for="contrasena">Contraseña</label>
+
+          <input
+            type="password"
+            id="contrasena"
+            placeholder="Escribe tu contraseña"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit">
+          Iniciar sesión
+          <span aria-hidden="true">→</span>
+        </button>
+
+        <p id="mensaje" class="mensaje" aria-live="polite"></p>
+
+      </form>
+
+      <div class="alternativa">
+        <p>¿Todavía no tienes una cuenta?</p>
+        <a href="/registro">
+          Crear una cuenta →
+        </a>
+      </div>
+
+      <a href="/catalogo" class="volver">
+        ← Volver al catálogo
+      </a>
+
+    </section>
+
+  </main>
+
+</Layout>
+
+<script>
+  import { supabase } from "../lib/supabase.js";
+
+  const formulario =
+    document.querySelector("#formulario-login");
+
+  const mensaje =
+    document.querySelector("#mensaje");
+
+  const usuario =
+    document.querySelector("#usuario");
+
+  const contrasena =
+    document.querySelector("#contrasena");
+
+  const boton =
+    formulario?.querySelector(
+      'button[type="submit"]'
+    );
+
+  formulario?.addEventListener(
+    "submit",
+    async (evento) => {
+
+      evento.preventDefault();
+
+      if (
+        !mensaje ||
+        !usuario ||
+        !contrasena ||
+        !boton
+      ) {
+        return;
+      }
+
+      mensaje.textContent =
+        "Verificando tus datos...";
+
+      boton.disabled = true;
+
+      try {
+
+        const { data, error } =
+          await supabase.auth.signInWithPassword({
+            email: usuario.value.trim(),
+            password: contrasena.value
+          });
+
+        if (error) {
+
+          mensaje.textContent =
+            "No se pudo iniciar sesión. Revisa tu correo y contraseña. Si acabas de registrarte, confirma primero tu correo electrónico.";
+
+          console.error(
+            "Error de inicio de sesión:",
+            error.message
+          );
+
+          return;
+        }
+
+        if (data.user) {
+
+          mensaje.textContent =
+            "¡Inicio de sesión exitoso! Entrando...";
+
+          window.location.href = "/cuenta";
+        }
+
+      } catch (error) {
+
+        mensaje.textContent =
+          "No se pudo conectar con el servicio. Comprueba tu conexión e inténtalo de nuevo.";
+
+        console.error(error);
+
+      } finally {
+
+        boton.disabled = false;
+
+      }
+    }
+  );
+</script>
+
+<style>
+  .login {
+    min-height: calc(100vh - 75px);
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    background: #f6f3ec;
+    color: #30342f;
+  }
+
+  .presentacion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 620px;
+    padding: 80px 10%;
+    background: #293e33;
+    color: #f6f3ec;
+  }
+
+  .etiqueta {
+    margin-bottom: 30px;
+    color: #b9c4b7;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .presentacion h1 {
+    max-width: 600px;
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(45px, 5.5vw, 72px);
+    font-weight: 400;
+    letter-spacing: -2px;
+    line-height: 1.04;
+  }
+
+  .presentacion h1 span {
+    display: block;
+    font-style: italic;
+  }
+
+  .descripcion {
+    max-width: 450px;
+    margin-top: 30px;
+    color: #d2d9d0;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .nota {
+    display: grid;
+    grid-template-columns: 45px 1fr;
+    gap: 15px;
+    max-width: 440px;
+    margin-top: 65px;
+    padding-top: 20px;
+    border-top: 1px solid #506456;
+  }
+
+  .nota span {
+    color: #b9c4b7;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+  }
+
+  .nota p {
+    max-width: 320px;
+    color: #bfc8be;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .formulario-seccion {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 70px 10%;
+  }
+
+  .encabezado-formulario {
+    margin-bottom: 38px;
+  }
+
+  .numero {
+    margin-bottom: 13px;
+    color: #657568;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+  }
+
+  .encabezado-formulario h2 {
+    margin-bottom: 10px;
+    color: #293e33;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 38px;
+    font-weight: 400;
+  }
+
+  .encabezado-formulario > p:last-child {
+    color: #777970;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  form {
+    width: 100%;
+  }
+
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .campo label {
+    color: #555b54;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  .campo input {
+    width: 100%;
+    height: 50px;
+    padding: 0 2px;
+    border: none;
+    border-bottom: 1px solid #c4c2b8;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+    color: #30342f;
+    font-size: 14px;
+  }
+
+  .campo input::placeholder {
+    color: #aaa9a1;
+  }
+
+  .campo input:focus {
+    border-bottom-color: #293e33;
+  }
+
+  form button {
+    width: 100%;
+    min-height: 50px;
+    margin-top: 8px;
+    border: none;
+    background: #293e33;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    font-size: 12px;
+    font-weight: 600;
+    transition:
+      background 0.2s ease,
+      gap 0.2s ease;
+  }
+
+  form button:hover {
+    background: #405b49;
+    gap: 18px;
+  }
+
+  form button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .mensaje {
+    min-height: 22px;
+    margin-top: 16px;
+    color: #657568;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .alternativa {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid #dcd8cd;
+  }
+
+  .alternativa p {
+    margin-bottom: 7px;
+    color: #777970;
+    font-size: 11px;
+  }
+
+  .alternativa a {
+    color: #293e33;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .alternativa a:hover {
+    color: #657568;
+  }
+
+  .volver {
+    display: inline-block;
+    margin-top: 35px;
+    color: #777970;
+    font-size: 11px;
+  }
+
+  .volver:hover {
+    color: #293e33;
+  }
+
+  @media (max-width: 800px) {
+    .login {
+      grid-template-columns: 1fr;
+    }
+
+    .presentacion {
+      min-height: auto;
+      padding: 65px 8%;
+    }
+
+    .nota {
+      margin-top: 45px;
+    }
+
+    .formulario-seccion {
+      max-width: 600px;
+      padding: 60px 8%;
+    }
+  }
+
+  @media (max-width: 450px) {
+    .presentacion {
+      padding: 50px 7%;
+    }
+
+    .presentacion h1 {
+      font-size: 45px;
+      letter-spacing: -1.2px;
+    }
+
+    .formulario-seccion {
+      padding: 50px 7%;
+    }
+
+    .encabezado-formulario h2 {
+      font-size: 34px;
+    }
+  }
+</style>
