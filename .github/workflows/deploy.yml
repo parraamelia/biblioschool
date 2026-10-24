@@ -22,8 +22,6 @@ jobs:
 
       - name: Construir proyecto Astro
         uses: withastro/action@v6
-        with:
-          node-version: 24
         env:
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
@@ -37,6 +35,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Publicar en GitHub Pages
+      - name: Publicar BiblioSchool
         id: deployment
         uses: actions/deploy-pages@v5
