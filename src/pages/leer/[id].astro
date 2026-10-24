@@ -1,11 +1,16 @@
+
 ---
 import Layout from "../../layouts/Layout.astro";
 import { libros } from "../../data/libros.js";
 
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
 export function getStaticPaths() {
   return libros.map((libro) => ({
     params: {
-      id: libro.id
+      id: String(libro.id)
     },
     props: {
       libro
@@ -14,67 +19,34 @@ export function getStaticPaths() {
 }
 
 const { libro } = Astro.props;
-
-if (!libro) {
-  return Astro.redirect("/catalogo");
-}
 ---
 
 <Layout titulo={`${libro.titulo} | BiblioSchool`}>
-
   <main class="lectura">
-
     <section class="cabecera">
-
       <div class="cabecera-texto">
-
-        <a href={`/libro/${libro.id}`} class="volver">
+        <a href={`${base}libro/${libro.id}/`} class="volver">
           ← Volver al libro
         </a>
 
-        <p class="etiqueta">
-          BIBLIOSCHOOL / LECTURA
-        </p>
-
-        <h1>
-          {libro.titulo}
-        </h1>
-
-        <p class="autor">
-          {libro.autor}
-        </p>
-
-        <p class="descripcion">
-          {libro.descripcion}
-        </p>
-
+        <p class="etiqueta">BIBLIOSCHOOL / LECTURA</p>
+        <h1>{libro.titulo}</h1>
+        <p class="autor">{libro.autor}</p>
+        <p class="descripcion">{libro.descripcion}</p>
       </div>
 
       <div class="ficha">
-
         <span>FICHA DE LECTURA</span>
-
-        <strong>
-          {libro.categoria}
-        </strong>
-
-        <small>
-          Publicación: {libro.anio}
-        </small>
-
+        <strong>{libro.categoria}</strong>
+        <small>Publicación: {libro.anio}</small>
       </div>
-
     </section>
 
-
     <section class="contenido">
-
       <aside class="indice">
-
         <p>CONTENIDO</p>
 
         <nav>
-
           {
             libro.contenido.map((seccion) => (
               <a href={`#seccion-${seccion.numero}`}>
@@ -83,32 +55,20 @@ if (!libro) {
               </a>
             ))
           }
-
         </nav>
-
       </aside>
 
-
       <article class="texto">
-
         <div class="inicio-lectura">
-
-          <p class="numero">
-            LECTURA
-          </p>
-
-          <h2>
-            Conoce la obra
-          </h2>
+          <p class="numero">LECTURA</p>
+          <h2>Conoce la obra</h2>
 
           <p>
             En esta sección encontrarás información organizada
             para comprender mejor la obra, sus temas principales
             y sus ideas más importantes.
           </p>
-
         </div>
-
 
         {
           libro.contenido.map((seccion) => (
@@ -116,48 +76,31 @@ if (!libro) {
               id={`seccion-${seccion.numero}`}
               class="seccion"
             >
-
               <div class="numero-seccion">
                 {seccion.numero}
               </div>
 
               <div>
-
-                <h2>
-                  {seccion.titulo}
-                </h2>
+                <h2>{seccion.titulo}</h2>
 
                 <div class="parrafos">
-
                   {
                     seccion.texto
                       .trim()
                       .split("\n\n")
                       .map((parrafo) => (
-                        <p>
-                          {parrafo.trim()}
-                        </p>
+                        <p>{parrafo.trim()}</p>
                       ))
                   }
-
                 </div>
-
               </div>
-
             </section>
           ))
         }
 
-
         <section class="final">
-
-          <p class="numero">
-            BIBLIOSCHOOL
-          </p>
-
-          <h2>
-            Terminaste esta sección.
-          </h2>
+          <p class="numero">BIBLIOSCHOOL</p>
+          <h2>Terminaste esta sección.</h2>
 
           <p>
             Puedes volver a la información del libro o regresar
@@ -165,49 +108,41 @@ if (!libro) {
           </p>
 
           <div class="acciones">
-
-            <a href={`/libro/${libro.id}`}>
+            <a href={`${base}libro/${libro.id}/`}>
               ← Información del libro
             </a>
 
-            <a href="/cuenta">
+            <a href={`${base}cuenta/`}>
               Mi biblioteca →
             </a>
-
           </div>
-
         </section>
-
       </article>
-
     </section>
-
   </main>
-
 </Layout>
-
 
 <script>
   import { supabase } from "../../lib/supabase.js";
 
-  async function comprobarSesion() {
+  const base = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
 
+  async function comprobarSesion() {
     const {
       data: { session }
     } = await supabase.auth.getSession();
 
     if (!session) {
-      window.location.href = "/login";
+      window.location.href = `${base}login/`;
     }
-
   }
 
   comprobarSesion();
 </script>
 
-
 <style>
-
   .lectura {
     max-width: 1200px;
     margin: 0 auto;
@@ -447,9 +382,7 @@ if (!libro) {
     text-decoration: underline;
   }
 
-
   @media (max-width: 850px) {
-
     .lectura {
       padding: 50px 25px 80px;
     }
@@ -478,12 +411,9 @@ if (!libro) {
       grid-template-columns: 1fr 1fr;
       gap: 0 25px;
     }
-
   }
 
-
   @media (max-width: 550px) {
-
     .lectura {
       padding: 40px 18px 70px;
     }
@@ -519,7 +449,5 @@ if (!libro) {
       font-size: 15px;
       line-height: 1.8;
     }
-
   }
-
 </style>

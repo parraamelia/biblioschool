@@ -1,11 +1,14 @@
+
 ---
 import Layout from "../layouts/Layout.astro";
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <Layout titulo="Iniciar sesión | BiblioSchool">
-
   <main class="login">
-
     <section class="presentacion">
       <p class="etiqueta">BIBLIOSCHOOL / CUENTA</p>
 
@@ -29,20 +32,15 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <section class="formulario-seccion">
-
       <div class="encabezado-formulario">
         <p class="numero">01 / ACCESO</p>
         <h2>Iniciar sesión</h2>
-        <p>
-          Introduce tus datos para acceder a tu cuenta.
-        </p>
+        <p>Introduce tus datos para acceder a tu cuenta.</p>
       </div>
 
       <form id="formulario-login">
-
         <div class="campo">
           <label for="usuario">Correo electrónico</label>
-
           <input
             type="email"
             id="usuario"
@@ -54,7 +52,6 @@ import Layout from "../layouts/Layout.astro";
 
         <div class="campo">
           <label for="contrasena">Contraseña</label>
-
           <input
             type="password"
             id="contrasena"
@@ -70,109 +67,70 @@ import Layout from "../layouts/Layout.astro";
         </button>
 
         <p id="mensaje" class="mensaje" aria-live="polite"></p>
-
       </form>
 
       <div class="alternativa">
         <p>¿Todavía no tienes una cuenta?</p>
-        <a href="/registro">
-          Crear una cuenta →
-        </a>
+        <a href={`${base}registro/`}>Crear una cuenta →</a>
       </div>
 
-      <a href="/catalogo" class="volver">
+      <a href={`${base}catalogo/`} class="volver">
         ← Volver al catálogo
       </a>
-
     </section>
-
   </main>
-
 </Layout>
 
 <script>
   import { supabase } from "../lib/supabase.js";
 
-  const formulario =
-    document.querySelector("#formulario-login");
+  const base = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
 
-  const mensaje =
-    document.querySelector("#mensaje");
+  const formulario = document.querySelector("#formulario-login");
+  const mensaje = document.querySelector("#mensaje");
+  const usuario = document.querySelector("#usuario");
+  const contrasena = document.querySelector("#contrasena");
+  const boton = formulario?.querySelector('button[type="submit"]');
 
-  const usuario =
-    document.querySelector("#usuario");
+  formulario?.addEventListener("submit", async (evento) => {
+    evento.preventDefault();
 
-  const contrasena =
-    document.querySelector("#contrasena");
+    if (!mensaje || !usuario || !contrasena || !boton) {
+      return;
+    }
 
-  const boton =
-    formulario?.querySelector(
-      'button[type="submit"]'
-    );
+    mensaje.textContent = "Verificando tus datos...";
+    boton.disabled = true;
 
-  formulario?.addEventListener(
-    "submit",
-    async (evento) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: usuario.value.trim(),
+        password: contrasena.value
+      });
 
-      evento.preventDefault();
+      if (error) {
+        mensaje.textContent =
+          "No se pudo iniciar sesión. Revisa tu correo y contraseña. Si acabas de registrarte, confirma primero tu correo electrónico.";
 
-      if (
-        !mensaje ||
-        !usuario ||
-        !contrasena ||
-        !boton
-      ) {
+        console.error("Error de inicio de sesión:", error.message);
         return;
       }
 
-      mensaje.textContent =
-        "Verificando tus datos...";
-
-      boton.disabled = true;
-
-      try {
-
-        const { data, error } =
-          await supabase.auth.signInWithPassword({
-            email: usuario.value.trim(),
-            password: contrasena.value
-          });
-
-        if (error) {
-
-          mensaje.textContent =
-            "No se pudo iniciar sesión. Revisa tu correo y contraseña. Si acabas de registrarte, confirma primero tu correo electrónico.";
-
-          console.error(
-            "Error de inicio de sesión:",
-            error.message
-          );
-
-          return;
-        }
-
-        if (data.user) {
-
-          mensaje.textContent =
-            "¡Inicio de sesión exitoso! Entrando...";
-
-          window.location.href = "/cuenta";
-        }
-
-      } catch (error) {
-
-        mensaje.textContent =
-          "No se pudo conectar con el servicio. Comprueba tu conexión e inténtalo de nuevo.";
-
-        console.error(error);
-
-      } finally {
-
-        boton.disabled = false;
-
+      if (data.user) {
+        mensaje.textContent = "¡Inicio de sesión exitoso! Entrando...";
+        window.location.href = `${base}cuenta/`;
       }
+    } catch (error) {
+      mensaje.textContent =
+        "No se pudo conectar con el servicio. Comprueba tu conexión e inténtalo de nuevo.";
+
+      console.error(error);
+    } finally {
+      boton.disabled = false;
     }
-  );
+  });
 </script>
 
 <style>
@@ -337,9 +295,7 @@ import Layout from "../layouts/Layout.astro";
     gap: 13px;
     font-size: 12px;
     font-weight: 600;
-    transition:
-      background 0.2s ease,
-      gap 0.2s ease;
+    transition: background 0.2s ease, gap 0.2s ease;
   }
 
   form button:hover {

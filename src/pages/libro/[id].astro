@@ -1,11 +1,16 @@
+
 ---
 import Layout from "../../layouts/Layout.astro";
 import { libros } from "../../data/libros.js";
 
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
 export function getStaticPaths() {
   return libros.map((libro) => ({
     params: {
-      id: libro.id
+      id: String(libro.id)
     },
     props: {
       libro
@@ -17,54 +22,28 @@ const { libro } = Astro.props;
 ---
 
 <Layout titulo={`${libro.titulo} | BiblioSchool`}>
-
   <main class="detalle">
-
-    <a href="/catalogo" class="volver">
+    <a href={`${base}catalogo/`} class="volver">
       ← Volver al catálogo
     </a>
 
-
     <section class="cabecera">
-
       <div class="portada">
-
         <span class="numero">
-          {libro.id.padStart(2, "0")}
+          {String(libro.id).padStart(2, "0")}
         </span>
 
-        <h1>
-          {libro.titulo}
-        </h1>
-
-        <p>
-          {libro.autor}
-        </p>
-
+        <h1>{libro.titulo}</h1>
+        <p>{libro.autor}</p>
       </div>
 
-
       <div class="informacion">
-
-        <p class="etiqueta">
-          BIBLIOSCHOOL / LIBRO
-        </p>
-
-        <h2>
-          {libro.titulo}
-        </h2>
-
-        <p class="autor">
-          {libro.autor}
-        </p>
-
-        <p class="descripcion">
-          {libro.descripcion}
-        </p>
-
+        <p class="etiqueta">BIBLIOSCHOOL / LIBRO</p>
+        <h2>{libro.titulo}</h2>
+        <p class="autor">{libro.autor}</p>
+        <p class="descripcion">{libro.descripcion}</p>
 
         <div class="datos">
-
           <div>
             <span>CATEGORÍA</span>
             <strong>{libro.categoria}</strong>
@@ -74,47 +53,27 @@ const { libro } = Astro.props;
             <span>PUBLICACIÓN</span>
             <strong>{libro.anio}</strong>
           </div>
-
         </div>
 
-
         <div class="seccion-acceso">
-
           <p>
             Puedes comenzar a leer este libro desde
             BiblioSchool.
           </p>
 
-          <a
-            href={`/leer/${libro.id}`}
-            class="boton"
-          >
+          <a href={`${base}leer/${libro.id}/`} class="boton">
             Comenzar a leer
             <span>→</span>
           </a>
-
         </div>
-
       </div>
-
     </section>
 
-
     <section class="informacion-lectura">
-
       <div>
-
-        <p class="numero-seccion">
-          BIBLIOSCHOOL
-        </p>
-
-        <h2>
-          Una lectura pensada
-          para aprender.
-        </h2>
-
+        <p class="numero-seccion">BIBLIOSCHOOL</p>
+        <h2>Una lectura pensada para aprender.</h2>
       </div>
-
 
       <p>
         En BiblioSchool puedes consultar información organizada
@@ -122,29 +81,21 @@ const { libro } = Astro.props;
         una sección de lectura donde encontrarás información sobre
         su contexto, temas y análisis.
       </p>
-
     </section>
 
-
     <section class="pie">
-
-      <a href="/catalogo">
+      <a href={`${base}catalogo/`}>
         ← Explorar otros libros
       </a>
 
-      <a href="/cuenta">
+      <a href={`${base}cuenta/`}>
         Mi biblioteca →
       </a>
-
     </section>
-
   </main>
-
 </Layout>
 
-
 <style>
-
   .detalle {
     max-width: 1200px;
     margin: 0 auto;
@@ -172,11 +123,9 @@ const { libro } = Astro.props;
   .portada {
     min-height: 540px;
     padding: 35px;
-
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
     background: #405b49;
     color: #f6f3ec;
   }
@@ -188,23 +137,14 @@ const { libro } = Astro.props;
 
   .portada h1 {
     margin: 40px 0 20px;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
+    font-family: Georgia, "Times New Roman", serif;
     font-size: 46px;
     font-weight: 400;
     line-height: 1.05;
   }
 
   .portada p {
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
+    font-family: Georgia, "Times New Roman", serif;
     font-size: 18px;
     font-style: italic;
   }
@@ -215,51 +155,32 @@ const { libro } = Astro.props;
 
   .etiqueta {
     margin-bottom: 25px;
-
     color: #687468;
-
     font-size: 10px;
     font-weight: 700;
-
     letter-spacing: 2px;
   }
 
   .informacion h2 {
     margin-bottom: 8px;
-
     color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
+    font-family: Georgia, "Times New Roman", serif;
     font-size: 48px;
     font-weight: 400;
-
     line-height: 1.05;
   }
 
   .autor {
     margin-bottom: 25px;
-
     color: #687468;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
+    font-family: Georgia, "Times New Roman", serif;
     font-size: 20px;
   }
 
   .descripcion {
     max-width: 580px;
-
     margin-bottom: 35px;
-
     color: #65665f;
-
     font-size: 15px;
     line-height: 1.8;
   }
@@ -267,7 +188,6 @@ const { libro } = Astro.props;
   .datos {
     display: grid;
     grid-template-columns: 1fr 1fr;
-
     border-top: 1px solid #dcd8cd;
     border-bottom: 1px solid #dcd8cd;
   }
@@ -283,20 +203,15 @@ const { libro } = Astro.props;
 
   .datos span {
     display: block;
-
     margin-bottom: 7px;
-
     color: #8b978b;
-
     font-size: 9px;
     font-weight: 700;
-
     letter-spacing: 1.5px;
   }
 
   .datos strong {
     color: #293e33;
-
     font-size: 13px;
     font-weight: 500;
   }
@@ -304,40 +219,28 @@ const { libro } = Astro.props;
   .seccion-acceso {
     margin-top: 50px;
     padding-top: 30px;
-
     border-top: 1px solid #293e33;
   }
 
   .seccion-acceso p {
     margin-bottom: 20px;
-
     color: #65665f;
-
     font-size: 14px;
     line-height: 1.7;
   }
 
   .boton {
     display: inline-flex;
-
     align-items: center;
     justify-content: space-between;
-
     min-width: 190px;
     min-height: 45px;
-
     padding: 0 18px;
-
     border: 1px solid #293e33;
-
     color: #293e33;
-
     font-size: 12px;
     font-weight: 700;
-
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .boton span {
@@ -352,67 +255,47 @@ const { libro } = Astro.props;
 
   .informacion-lectura {
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
     gap: 80px;
-
     margin-top: 100px;
     padding: 60px 0;
-
     border-top: 1px solid #dcd8cd;
     border-bottom: 1px solid #dcd8cd;
   }
 
   .numero-seccion {
     margin-bottom: 12px;
-
     color: #8b978b;
-
     font-size: 10px;
     font-weight: 700;
-
     letter-spacing: 1.7px;
   }
 
   .informacion-lectura h2 {
     max-width: 450px;
-
     color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
+    font-family: Georgia, "Times New Roman", serif;
     font-size: 38px;
     font-weight: 400;
-
     line-height: 1.1;
   }
 
   .informacion-lectura > p {
     align-self: end;
-
     color: #65665f;
-
     font-size: 15px;
     line-height: 1.9;
   }
 
   .pie {
     display: flex;
-
     justify-content: space-between;
-
     gap: 30px;
-
     padding-top: 35px;
   }
 
   .pie a {
     color: #293e33;
-
     font-size: 12px;
     font-weight: 600;
   }
@@ -421,9 +304,7 @@ const { libro } = Astro.props;
     text-decoration: underline;
   }
 
-
   @media (max-width: 900px) {
-
     .cabecera {
       grid-template-columns: 300px 1fr;
       gap: 50px;
@@ -436,12 +317,9 @@ const { libro } = Astro.props;
     .informacion h2 {
       font-size: 38px;
     }
-
   }
 
-
   @media (max-width: 750px) {
-
     .detalle {
       padding: 50px 25px 80px;
     }
@@ -460,12 +338,9 @@ const { libro } = Astro.props;
       grid-template-columns: 1fr;
       gap: 35px;
     }
-
   }
 
-
   @media (max-width: 500px) {
-
     .detalle {
       padding: 40px 18px 70px;
     }
@@ -501,7 +376,5 @@ const { libro } = Astro.props;
     .pie {
       flex-direction: column;
     }
-
   }
-
 </style>

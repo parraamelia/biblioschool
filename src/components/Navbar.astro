@@ -1,10 +1,13 @@
 
 ---
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
 const inicio = base;
-const catalogo = `${base}catalogo`;
-const login = `${base}login`;
-const registro = `${base}registro`;
+const catalogo = `${base}catalogo/`;
+const login = `${base}login/`;
+const registro = `${base}registro/`;
 ---
 
 <header class="navbar">
