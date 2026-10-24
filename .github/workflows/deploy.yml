@@ -1,10 +1,10 @@
+
 name: Deploy BiblioSchool to GitHub Pages
 
 on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,7 @@ jobs:
       - name: Descargar proyecto
         uses: actions/checkout@v7
 
-      - name: Construir proyecto Astro
+      - name: Construir y preparar Astro
         uses: withastro/action@v6
         env:
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
