@@ -1,4 +1,3 @@
----
 import Layout from "../../layouts/Layout.astro";
 import { libros } from "../../data/libros.js";
 
@@ -64,6 +63,24 @@ const { libro } = Astro.props;
           </div>
         </div>
 
+        <div class="acciones-libro">
+          <button
+            id="boton-me-gusta"
+            class="boton-me-gusta"
+            type="button"
+            aria-pressed="false"
+          >
+            <span id="icono-me-gusta">♡</span>
+            <span id="texto-me-gusta">Me gusta</span>
+          </button>
+
+          <p
+            id="mensaje-me-gusta"
+            class="mensaje-me-gusta"
+            aria-live="polite"
+          ></p>
+        </div>
+
       </div>
 
     </section>
@@ -74,18 +91,14 @@ const { libro } = Astro.props;
         <span class="numero">01</span>
         <h2>Resumen del libro</h2>
 
-        <p>
-          {libro.resumen}
-        </p>
+        <p>{libro.resumen}</p>
       </article>
 
       <article class="seccion-info">
         <span class="numero">02</span>
         <h2>Sobre esta obra</h2>
 
-        <p>
-          {libro.sobre}
-        </p>
+        <p>{libro.sobre}</p>
       </article>
 
     </section>
@@ -109,9 +122,7 @@ const { libro } = Astro.props;
       </div>
 
       <div id="lista-reseñas" class="lista-reseñas">
-        <p class="cargando">
-          Cargando reseñas...
-        </p>
+        <p class="cargando">Cargando reseñas...</p>
       </div>
 
       <div class="formulario-reseña">
@@ -197,19 +208,172 @@ const { libro } = Astro.props;
   const mensaje =
     document.querySelector("#mensaje-reseña");
 
+  // Elementos del botón Me gusta
+  const botonMeGusta =
+    document.querySelector("#boton-me-gusta");
+
+  const iconoMeGusta =
+    document.querySelector("#icono-me-gusta");
+
+  const textoMeGusta =
+    document.querySelector("#texto-me-gusta");
+
+  const mensajeMeGusta =
+    document.querySelector("#mensaje-me-gusta");
+
+  let libroMarcadoMeGusta = false;
+
+  // Cambiar el aspecto del botón según su estado
+  function actualizarBotonMeGusta(marcado) {
+    libroMarcadoMeGusta = marcado;
+
+    botonMeGusta?.classList.toggle("marcado", marcado);
+
+    botonMeGusta?.setAttribute(
+      "aria-pressed",
+      String(marcado)
+    );
+
+    if (iconoMeGusta) {
+      iconoMeGusta.textContent = marcado ? "♥" : "♡";
+    }
+
+    if (textoMeGusta) {
+      textoMeGusta.textContent = marcado
+        ? "Te gusta"
+        : "Me gusta";
+    }
+  }
+
+  // Consultar si el usuario ya marcó este libro
+  async function cargarEstadoMeGusta() {
+    const { data: sesionData, error: sesionError } =
+      await supabase.auth.getSession();
+
+    if (sesionError || !sesionData.session) {
+      actualizarBotonMeGusta(false);
+      return;
+    }
+
+    const usuario = sesionData.session.user;
+
+    const { data, error } = await supabase
+      .from("libros_me_gusta")
+      .select("libro_id")
+      .eq("usuario_id", usuario.id)
+      .eq("libro_id", libroId)
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        "Error al consultar Me gusta:",
+        error
+      );
+
+      mensajeMeGusta.textContent =
+        "No se pudo comprobar si te gusta este libro.";
+
+      return;
+    }
+
+    actualizarBotonMeGusta(Boolean(data));
+  }
+
+  // Guardar o quitar un libro de Me gusta
+  botonMeGusta?.addEventListener("click", async () => {
+    mensajeMeGusta.textContent = "";
+
+    const { data: sesionData, error: sesionError } =
+      await supabase.auth.getSession();
+
+    if (sesionError || !sesionData.session) {
+      mensajeMeGusta.textContent =
+        "Inicia sesión para guardar este libro en Me gusta.";
+
+      return;
+    }
+
+    const usuario = sesionData.session.user;
+
+    botonMeGusta.disabled = true;
+
+    try {
+      if (libroMarcadoMeGusta) {
+        const { error } = await supabase
+          .from("libros_me_gusta")
+          .delete()
+          .eq("usuario_id", usuario.id)
+          .eq("libro_id", libroId);
+
+        if (error) {
+          console.error(error);
+
+          mensajeMeGusta.textContent =
+            "No se pudo quitar este libro de Me gusta.";
+        } else {
+          actualizarBotonMeGusta(false);
+
+          mensajeMeGusta.textContent =
+            "Libro quitado de Me gusta.";
+        }
+      } else {
+        const { error } = await supabase
+          .from("libros_me_gusta")
+          .insert({
+            usuario_id: usuario.id,
+            libro_id: libroId
+          });
+
+        if (error) {
+          console.error(error);
+
+          if (error.code === "23505") {
+            actualizarBotonMeGusta(true);
+
+            mensajeMeGusta.textContent =
+              "Este libro ya está en tus Me gusta.";
+          } else {
+            mensajeMeGusta.textContent =
+              "No se pudo guardar el libro. Revisa la configuración de Supabase.";
+          }
+        } else {
+          actualizarBotonMeGusta(true);
+
+          mensajeMeGusta.textContent =
+            "¡Libro guardado en tus Me gusta!";
+        }
+      }
+    } catch (error) {
+      console.error(error);
+
+      mensajeMeGusta.textContent =
+        "Ocurrió un error. Inténtalo nuevamente.";
+    } finally {
+      botonMeGusta.disabled = false;
+    }
+  });
+
+  // Mostrar estrellas de las reseñas
   function mostrarEstrellas(numero) {
-    const cantidad = Math.round(Number(numero));
+    const cantidad = Math.max(
+      0,
+      Math.min(5, Math.round(Number(numero)))
+    );
 
     return "★".repeat(cantidad) +
       "☆".repeat(5 - cantidad);
   }
 
+  // Evitar que el texto de las reseñas se interprete como HTML
   function escaparTexto(texto) {
     const div = document.createElement("div");
-    div.textContent = texto;
+
+    div.textContent = texto ?? "";
+
     return div.innerHTML;
   }
 
+  // Cargar las reseñas del libro
   async function cargarResenas() {
     const { data, error } = await supabase
       .from("reseñas_libros")
@@ -220,23 +384,31 @@ const { libro } = Astro.props;
       });
 
     if (error) {
+      console.error(error);
+
       listaResenas.innerHTML = `
         <p class="sin-resenas">
           No se pudieron cargar las reseñas.
         </p>
       `;
+
       return;
     }
 
     if (!data || data.length === 0) {
       promedio.textContent = "0.0";
+
       estrellasPromedio.textContent = "☆☆☆☆☆";
-      cantidadResenas.textContent = "Todavía no hay reseñas";
+
+      cantidadResenas.textContent =
+        "Todavía no hay reseñas";
 
       listaResenas.innerHTML = `
         <div class="sin-resenas">
           <div class="icono-reseña">✦</div>
+
           <h3>Aún no hay reseñas</h3>
+
           <p>
             Sé la primera persona en compartir su opinión
             sobre este libro.
@@ -301,11 +473,12 @@ const { libro } = Astro.props;
       .join("");
   }
 
+  // Comprobar que haya una sesión iniciada
   async function comprobarUsuario() {
-    const { data } =
+    const { data, error } =
       await supabase.auth.getSession();
 
-    if (!data.session) {
+    if (error || !data.session) {
       mensaje.textContent =
         "Debes iniciar sesión para publicar una reseña.";
 
@@ -317,55 +490,53 @@ const { libro } = Astro.props;
     return data.session.user;
   }
 
-  publicar?.addEventListener(
-    "click",
-    async () => {
+  // Publicar una reseña
+  publicar?.addEventListener("click", async () => {
+    mensaje.textContent = "";
 
-      mensaje.textContent = "";
+    const usuario = await comprobarUsuario();
 
-      const usuario =
-        await comprobarUsuario();
+    if (!usuario) {
+      return;
+    }
 
-      if (!usuario) {
-        return;
-      }
+    const texto = comentario.value.trim();
 
-      const texto =
-        comentario.value.trim();
+    if (!texto) {
+      mensaje.textContent =
+        "Escribe una reseña antes de publicarla.";
 
-      if (!texto) {
-        mensaje.textContent =
-          "Escribe una reseña antes de publicarla.";
-        return;
-      }
+      return;
+    }
 
-      if (texto.length < 10) {
-        mensaje.textContent =
-          "La reseña debe tener al menos 10 caracteres.";
-        return;
-      }
+    if (texto.length < 10) {
+      mensaje.textContent =
+        "La reseña debe tener al menos 10 caracteres.";
 
-      publicar.disabled = true;
-      publicar.textContent = "Publicando...";
+      return;
+    }
 
-      const datosUsuario =
-        usuario.user_metadata || {};
+    publicar.disabled = true;
 
-      const nombre =
-        datosUsuario.nombre_usuario ||
-        datosUsuario.nombre_completo ||
-        usuario.email?.split("@")[0] ||
-        "Usuario";
+    publicar.textContent = "Publicando...";
 
+    const datosUsuario =
+      usuario.user_metadata || {};
+
+    const nombre =
+      datosUsuario.nombre_usuario ||
+      datosUsuario.nombre_completo ||
+      usuario.email?.split("@")[0] ||
+      "Usuario";
+
+    try {
       const { error } = await supabase
         .from("reseñas_libros")
         .insert({
           libro_id: libroId,
           usuario_id: usuario.id,
           nombre_usuario: nombre,
-          calificacion: Number(
-            calificacion.value
-          ),
+          calificacion: Number(calificacion.value),
           comentario: texto
         });
 
@@ -374,10 +545,6 @@ const { libro } = Astro.props;
 
         mensaje.textContent =
           "No se pudo publicar la reseña.";
-
-        publicar.disabled = false;
-        publicar.textContent =
-          "Publicar reseña";
 
         return;
       }
@@ -389,16 +556,22 @@ const { libro } = Astro.props;
       mensaje.textContent =
         "¡Tu reseña fue publicada correctamente!";
 
-      publicar.disabled = false;
-      publicar.textContent =
-        "Publicar reseña";
-
       await cargarResenas();
+    } catch (error) {
+      console.error(error);
+
+      mensaje.textContent =
+        "Ocurrió un error al publicar la reseña.";
+    } finally {
+      publicar.disabled = false;
+
+      publicar.textContent = "Publicar reseña";
     }
-  );
+  });
 
   comprobarUsuario();
   cargarResenas();
+  cargarEstadoMeGusta();
 </script>
 
 <style>
@@ -484,6 +657,54 @@ const { libro } = Astro.props;
   .datos span {
     color: #756b62;
     font-size: 0.83rem;
+  }
+
+  /* Estilos del botón Me gusta */
+  .acciones-libro {
+    margin-top: 24px;
+  }
+
+  .boton-me-gusta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #d9c7b2;
+    border-radius: 12px;
+    background: #fffdf9;
+    color: #6e4f3a;
+    padding: 13px 20px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+  }
+
+  .boton-me-gusta:hover {
+    background: #f5e9df;
+    transform: translateY(-1px);
+  }
+
+  .boton-me-gusta.marcado {
+    background: #8f3f4b;
+    border-color: #8f3f4b;
+    color: white;
+  }
+
+  .boton-me-gusta:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+
+  #icono-me-gusta {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  .mensaje-me-gusta {
+    min-height: 1.2em;
+    margin: 10px 0 0;
+    color: #756b62;
+    font-size: 0.88rem;
   }
 
   .contenido-libro {
