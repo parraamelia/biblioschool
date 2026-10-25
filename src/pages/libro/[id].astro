@@ -1,3 +1,4 @@
+---
 import Layout from "../../layouts/Layout.astro";
 import { libros } from "../../data/libros.js";
 
@@ -54,7 +55,7 @@ const { libro } = Astro.props;
 
           <div>
             <strong>Páginas</strong>
-            <span>{libro.paginas}</span>
+            <span>{libro.paginas ?? "No especificado"}</span>
           </div>
 
           <div>
@@ -208,7 +209,6 @@ const { libro } = Astro.props;
   const mensaje =
     document.querySelector("#mensaje-reseña");
 
-  // Elementos del botón Me gusta
   const botonMeGusta =
     document.querySelector("#boton-me-gusta");
 
@@ -223,7 +223,6 @@ const { libro } = Astro.props;
 
   let libroMarcadoMeGusta = false;
 
-  // Cambiar el aspecto del botón según su estado
   function actualizarBotonMeGusta(marcado) {
     libroMarcadoMeGusta = marcado;
 
@@ -245,55 +244,54 @@ const { libro } = Astro.props;
     }
   }
 
-  // Consultar si el usuario ya marcó este libro
   async function cargarEstadoMeGusta() {
-    const { data: sesionData, error: sesionError } =
+    const { data, error } =
       await supabase.auth.getSession();
 
-    if (sesionError || !sesionData.session) {
+    if (error || !data.session) {
       actualizarBotonMeGusta(false);
       return;
     }
 
-    const usuario = sesionData.session.user;
+    const usuario = data.session.user;
 
-    const { data, error } = await supabase
-      .from("libros_me_gusta")
-      .select("libro_id")
-      .eq("usuario_id", usuario.id)
-      .eq("libro_id", libroId)
-      .maybeSingle();
+    const { data: favorito, error: errorFavorito } =
+      await supabase
+        .from("libros_me_gusta")
+        .select("libro_id")
+        .eq("usuario_id", usuario.id)
+        .eq("libro_id", libroId)
+        .maybeSingle();
 
-    if (error) {
+    if (errorFavorito) {
       console.error(
         "Error al consultar Me gusta:",
-        error
+        errorFavorito
       );
 
       mensajeMeGusta.textContent =
-        "No se pudo comprobar si te gusta este libro.";
+        "No se pudo consultar tu lista de Me gusta.";
 
       return;
     }
 
-    actualizarBotonMeGusta(Boolean(data));
+    actualizarBotonMeGusta(Boolean(favorito));
   }
 
-  // Guardar o quitar un libro de Me gusta
   botonMeGusta?.addEventListener("click", async () => {
     mensajeMeGusta.textContent = "";
 
-    const { data: sesionData, error: sesionError } =
+    const { data, error: errorSesion } =
       await supabase.auth.getSession();
 
-    if (sesionError || !sesionData.session) {
+    if (errorSesion || !data.session) {
       mensajeMeGusta.textContent =
         "Inicia sesión para guardar este libro en Me gusta.";
 
       return;
     }
 
-    const usuario = sesionData.session.user;
+    const usuario = data.session.user;
 
     botonMeGusta.disabled = true;
 
@@ -309,7 +307,7 @@ const { libro } = Astro.props;
           console.error(error);
 
           mensajeMeGusta.textContent =
-            "No se pudo quitar este libro de Me gusta.";
+            "No se pudo quitar el libro de Me gusta.";
         } else {
           actualizarBotonMeGusta(false);
 
@@ -334,7 +332,7 @@ const { libro } = Astro.props;
               "Este libro ya está en tus Me gusta.";
           } else {
             mensajeMeGusta.textContent =
-              "No se pudo guardar el libro. Revisa la configuración de Supabase.";
+              "No se pudo guardar el libro. Revisa Supabase.";
           }
         } else {
           actualizarBotonMeGusta(true);
@@ -353,7 +351,6 @@ const { libro } = Astro.props;
     }
   });
 
-  // Mostrar estrellas de las reseñas
   function mostrarEstrellas(numero) {
     const cantidad = Math.max(
       0,
@@ -364,7 +361,6 @@ const { libro } = Astro.props;
       "☆".repeat(5 - cantidad);
   }
 
-  // Evitar que el texto de las reseñas se interprete como HTML
   function escaparTexto(texto) {
     const div = document.createElement("div");
 
@@ -373,7 +369,6 @@ const { libro } = Astro.props;
     return div.innerHTML;
   }
 
-  // Cargar las reseñas del libro
   async function cargarResenas() {
     const { data, error } = await supabase
       .from("reseñas_libros")
@@ -406,9 +401,7 @@ const { libro } = Astro.props;
       listaResenas.innerHTML = `
         <div class="sin-resenas">
           <div class="icono-reseña">✦</div>
-
           <h3>Aún no hay reseñas</h3>
-
           <p>
             Sé la primera persona en compartir su opinión
             sobre este libro.
@@ -442,9 +435,7 @@ const { libro } = Astro.props;
       .map(
         (resena) => `
           <article class="resena">
-
             <div class="resena-superior">
-
               <div>
                 <strong>
                   ${escaparTexto(resena.nombre_usuario)}
@@ -460,20 +451,17 @@ const { libro } = Astro.props;
                   resena.creado_en
                 ).toLocaleDateString("es-EC")}
               </span>
-
             </div>
 
             <p>
               ${escaparTexto(resena.comentario)}
             </p>
-
           </article>
         `
       )
       .join("");
   }
 
-  // Comprobar que haya una sesión iniciada
   async function comprobarUsuario() {
     const { data, error } =
       await supabase.auth.getSession();
@@ -490,7 +478,6 @@ const { libro } = Astro.props;
     return data.session.user;
   }
 
-  // Publicar una reseña
   publicar?.addEventListener("click", async () => {
     mensaje.textContent = "";
 
@@ -517,7 +504,6 @@ const { libro } = Astro.props;
     }
 
     publicar.disabled = true;
-
     publicar.textContent = "Publicando...";
 
     const datosUsuario =
@@ -550,7 +536,6 @@ const { libro } = Astro.props;
       }
 
       comentario.value = "";
-
       calificacion.value = "5";
 
       mensaje.textContent =
@@ -564,7 +549,6 @@ const { libro } = Astro.props;
         "Ocurrió un error al publicar la reseña.";
     } finally {
       publicar.disabled = false;
-
       publicar.textContent = "Publicar reseña";
     }
   });
@@ -659,7 +643,6 @@ const { libro } = Astro.props;
     font-size: 0.83rem;
   }
 
-  /* Estilos del botón Me gusta */
   .acciones-libro {
     margin-top: 24px;
   }
