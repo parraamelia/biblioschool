@@ -1,4 +1,3 @@
-
 ---
 import Layout from "../layouts/Layout.astro";
 import { libros } from "../data/libros.js";
@@ -218,7 +217,6 @@ const base = import.meta.env.BASE_URL.endsWith("/")
   const mensajeGustos = document.querySelector("#mensaje-gustos");
   const botonGuardar = document.querySelector("#guardar-gustos");
 
-  const vistaPerfil = document.querySelector("#vista-perfil");
   const resumenDescripcion = document.querySelector("#resumen-descripcion");
   const resumenGeneros = document.querySelector("#resumen-generos");
   const resumenTipos = document.querySelector("#resumen-tipos");
@@ -280,7 +278,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     return libros.find((libro) => Number(libro.id) === Number(id));
   }
 
-  function crearTarjeta(libro) {
+  function crearTarjeta(libro, tipoLista = "") {
     const articulo = document.createElement("article");
     articulo.className = "libro-card";
 
@@ -324,10 +322,62 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     informacion.append(categoria, titulo, autor, enlace);
     articulo.append(enlacePortada, informacion);
 
+    if (tipoLista === "gustos" || tipoLista === "despues") {
+      const quitar = document.createElement("button");
+      quitar.type = "button";
+      quitar.className = "boton-quitar";
+      quitar.textContent =
+        tipoLista === "gustos"
+          ? "Quitar de Me gusta"
+          : "Quitar de Leer más tarde";
+
+      quitar.addEventListener("click", async () => {
+        quitar.disabled = true;
+        quitar.textContent = "Quitando...";
+
+        const tabla =
+          tipoLista === "gustos"
+            ? "libros_me_gusta"
+            : "libros_leer_despues";
+
+        const { error } = await supabase
+          .from(tabla)
+          .delete()
+          .eq("usuario_id", usuarioActual.id)
+          .eq("libro_id", libro.id);
+
+        if (error) {
+          quitar.disabled = false;
+          quitar.textContent =
+            tipoLista === "gustos"
+              ? "Quitar de Me gusta"
+              : "Quitar de Leer más tarde";
+
+          mostrarMensaje(
+            mensajeGeneral,
+            "No se pudo quitar el libro. Inténtalo nuevamente.",
+            "error"
+          );
+          console.error(error);
+          return;
+        }
+
+        mostrarMensaje(mensajeGeneral, "Libro quitado correctamente.", "exito");
+
+        if (tipoLista === "gustos") {
+          await cargarMeGusta();
+        } else {
+          await cargarLeerDespues();
+        }
+      });
+
+      informacion.append(quitar);
+    }
+
     return articulo;
   }
 
-  function mostrarLibros(contenedor, ids, mensajeVacio) {
+  function mostrarLibros(contenedor, ids, mensajeVacio, tipoLista = "") {
     contenedor.replaceChildren();
 
     const encontrados = ids.map(buscarLibro).filter(Boolean);
@@ -341,7 +391,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     }
 
     encontrados.forEach((libro) => {
-      contenedor.append(crearTarjeta(libro));
+      contenedor.append(crearTarjeta(libro, tipoLista));
     });
   }
 
@@ -520,7 +570,8 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     mostrarLibros(
       listaMeGusta,
       (data || []).map((fila) => fila.libro_id),
-      "Todavía no has dado Me gusta a ningún libro. Explora el catálogo y marca tus favoritos."
+      "Todavía no has dado Me gusta a ningún libro. Explora el catálogo y marca tus favoritos.",
+      "gustos"
     );
   }
 
@@ -539,7 +590,8 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     mostrarLibros(
       listaLeerDespues,
       (data || []).map((fila) => fila.libro_id),
-      "Todavía no has guardado libros para leer más tarde."
+      "Todavía no has guardado libros para leer más tarde.",
+      "despues"
     );
   }
 
@@ -1038,6 +1090,32 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
   .boton-libro:hover {
     background: #574b40;
+  }
+
+  .boton-quitar {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #d8b9b5;
+    border-radius: 9px;
+    background: #fff5f4;
+    color: #a12e2e;
+    font: inherit;
+    font-size: .84rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+
+  .boton-quitar:hover {
+    background: #a12e2e;
+    color: white;
+  }
+
+  .boton-quitar:disabled {
+    opacity: .6;
+    cursor: wait;
   }
 
   .estado-vacio {
