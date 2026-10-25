@@ -1,82 +1,621 @@
+
 ---
 import Layout from "../layouts/Layout.astro";
 import { libros } from "../data/libros.js";
 
-const base = "/biblioschool/";
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <Layout
   titulo="Mi cuenta | BiblioSchool"
-  descripcion="Espacio personal de BiblioSchool."
+  descripcion="Tu perfil de lector y tu biblioteca personal."
 >
   <main class="cuenta">
     <section class="bienvenida">
       <div>
-        <p class="etiqueta">BIBLIOSCHOOL</p>
+        <p class="etiqueta">BIBLIOSCHOOL · MI ESPACIO</p>
         <h1>Mi cuenta</h1>
-        <p id="saludo">
-          Bienvenido a tu espacio personal.
-        </p>
+        <p id="saludo">Cargando tu espacio personal...</p>
         <p id="correo-usuario" class="correo"></p>
       </div>
-
-      <button id="cerrar-sesion" class="boton-salir">
-        Cerrar sesión
-      </button>
+      <button id="cerrar-sesion" class="boton-salir">Cerrar sesión</button>
     </section>
 
-    <section class="biblioteca">
-      <div class="titulo-seccion">
-        <div>
-          <p class="etiqueta">TU BIBLIOTECA</p>
-          <h2>Libros disponibles</h2>
+    <p id="mensaje-general" class="mensaje-general" role="status"></p>
+
+    <section id="vista-perfil" class="vista">
+      <article class="panel perfil-panel">
+        <p class="etiqueta">TU ESPACIO PERSONAL</p>
+        <h2>Mi perfil de lector</h2>
+        <p class="descripcion-seccion">
+          Este es tu espacio personal. Aquí puedes consultar tus gustos
+          y entrar a cada sección de tu biblioteca.
+        </p>
+
+        <div class="descripcion-lector">
+          <h3>Mi descripción</h3>
+          <p id="resumen-descripcion">
+            Todavía no has escrito tu descripción de lector.
+          </p>
+          <p><strong>Mis géneros:</strong> <span id="resumen-generos">Aún no seleccionados</span></p>
+          <p><strong>Mis historias:</strong> <span id="resumen-tipos">Aún no seleccionadas</span></p>
+          <p><strong>Extensión preferida:</strong> <span id="resumen-extension">Sin preferencia</span></p>
+          <button type="button" class="boton-principal" id="editar-perfil">
+            Editar perfil
+          </button>
+        </div>
+      </article>
+
+      <div class="opciones-cuenta">
+        <button type="button" class="opcion-cuenta" data-vista="formulario">
+          <span class="icono opcion-formulario">☷</span>
+          <span class="texto-opcion">
+            <strong>Ver mi formulario</strong>
+            <small>Consultar y cambiar mis preferencias de lectura.</small>
+          </span>
+          <span class="flecha">›</span>
+        </button>
+
+        <button type="button" class="opcion-cuenta" data-vista="gustos">
+          <span class="icono opcion-gustos">♥</span>
+          <span class="texto-opcion">
+            <strong>Ver mis Me gusta</strong>
+            <small>Consultar todos mis libros favoritos.</small>
+          </span>
+          <span class="flecha">›</span>
+        </button>
+
+        <button type="button" class="opcion-cuenta" data-vista="despues">
+          <span class="icono opcion-despues">▣</span>
+          <span class="texto-opcion">
+            <strong>Ver Leer más tarde</strong>
+            <small>Consultar los libros que guardé para después.</small>
+          </span>
+          <span class="flecha">›</span>
+        </button>
+
+        <button type="button" class="opcion-cuenta" data-vista="resenas">
+          <span class="icono opcion-resenas">✎</span>
+          <span class="texto-opcion">
+            <strong>Ver mis reseñas</strong>
+            <small>Consultar mis opiniones y calificaciones.</small>
+          </span>
+          <span class="flecha">›</span>
+        </button>
+
+        <button type="button" class="opcion-cuenta" data-vista="recomendaciones">
+          <span class="icono opcion-recomendaciones">✦</span>
+          <span class="texto-opcion">
+            <strong>Mis recomendaciones</strong>
+            <small>Descubrir libros según mis gustos.</small>
+          </span>
+          <span class="flecha">›</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="vista-formulario" class="vista panel" hidden>
+      <button type="button" class="boton-volver" data-volver>← Volver a Mi cuenta</button>
+      <p class="etiqueta">PERSONALIZA TU EXPERIENCIA</p>
+      <h2>Mis gustos de lectura</h2>
+      <p class="descripcion-seccion">
+        Completa tus preferencias para recibir recomendaciones de libros.
+      </p>
+
+      <form id="form-gustos">
+        <label for="descripcion-gustos">Describe qué te gusta leer</label>
+        <textarea
+          id="descripcion-gustos"
+          rows="4"
+          maxlength="1500"
+          placeholder="Ej.: Me gustan las historias de amor imposibles, los finales tristes y los personajes complejos..."
+        ></textarea>
+
+        <label>¿Qué géneros te interesan?</label>
+        <div class="opciones">
+          {["Romance", "Misterio", "Terror", "Fantasía", "Aventura", "Ciencia ficción", "Drama", "Clásicos", "Literatura", "Teatro", "Relatos"].map((genero) => (
+            <label class="opcion">
+              <input type="checkbox" name="genero" value={genero} />
+              <span>{genero}</span>
+            </label>
+          ))}
         </div>
 
-        <span class="cantidad">{libros.length} títulos</span>
+        <label>¿Qué tipo de historias prefieres?</label>
+        <div class="opciones">
+          {["Intensas y emotivas", "Suspenso y misterio", "Fantásticas e imaginativas", "Realistas y reflexivas", "Aventura y acción"].map((tipo) => (
+            <label class="opcion">
+              <input type="checkbox" name="tipo-historia" value={tipo} />
+              <span>{tipo}</span>
+            </label>
+          ))}
+        </div>
+
+        <label for="extension-preferida">¿Qué extensión prefieres?</label>
+        <select id="extension-preferida">
+          <option value="Cualquiera">No tengo preferencia</option>
+          <option value="Cortos">Libros cortos</option>
+          <option value="Medianos">Libros medianos</option>
+          <option value="Largos">Libros largos</option>
+        </select>
+
+        <button class="boton-principal" type="submit" id="guardar-gustos">
+          Guardar mis gustos
+        </button>
+        <p id="mensaje-gustos" class="mensaje-formulario" role="status"></p>
+      </form>
+    </section>
+
+    <section id="vista-gustos" class="vista panel" hidden>
+      <button type="button" class="boton-volver" data-volver>← Volver a Mi cuenta</button>
+      <p class="etiqueta">TUS FAVORITOS</p>
+      <h2>Mis Me gusta <span class="corazon">♥</span></h2>
+      <p class="descripcion-seccion">Aquí aparecen los libros que marcaste con Me gusta.</p>
+      <div id="lista-me-gusta" class="libros-grid">
+        <p class="estado-vacio">Cargando tus favoritos...</p>
       </div>
+    </section>
 
-      <div class="libros-grid">
-        {libros.map((libro) => (
-          <article class="libro-card">
-            <a href={`${base}libro/${libro.id}/`} class="portada-link">
-              <div class="portada">
-                <img
-                  src={libro.portada}
-                  alt={`Portada de ${libro.titulo}`}
-                  loading="lazy"
-                />
-              </div>
-            </a>
-
-            <div class="informacion">
-              <span class="categoria">{libro.categoria}</span>
-
-              <h3>{libro.titulo}</h3>
-
-              <p>{libro.autor}</p>
-
-              <a
-                href={`${base}libro/${libro.id}/`}
-                class="boton-libro"
-              >
-                Ver libro
-              </a>
-            </div>
-          </article>
-        ))}
+    <section id="vista-despues" class="vista panel" hidden>
+      <button type="button" class="boton-volver" data-volver>← Volver a Mi cuenta</button>
+      <p class="etiqueta">PARA DESPUÉS</p>
+      <h2>Leer más tarde</h2>
+      <p class="descripcion-seccion">Aquí aparecen los libros que guardaste para leer después.</p>
+      <div id="lista-leer-despues" class="libros-grid">
+        <p class="estado-vacio">Cargando tus libros guardados...</p>
       </div>
+    </section>
+
+    <section id="vista-resenas" class="vista panel" hidden>
+      <button type="button" class="boton-volver" data-volver>← Volver a Mi cuenta</button>
+      <p class="etiqueta">TU OPINIÓN CUENTA</p>
+      <h2>Mis reseñas</h2>
+      <p class="descripcion-seccion">Consulta las reseñas que has publicado.</p>
+      <div id="lista-resenas" class="lista-resenas">
+        <p class="estado-vacio">Cargando tus reseñas...</p>
+      </div>
+    </section>
+
+    <section id="vista-recomendaciones" class="vista panel" hidden>
+      <button type="button" class="boton-volver" data-volver>← Volver a Mi cuenta</button>
+      <p class="etiqueta">LECTURAS PARA TI</p>
+      <h2>Mis recomendaciones</h2>
+      <p class="descripcion-seccion">
+        Libros seleccionados según tus preferencias de lectura.
+      </p>
+      <div id="recomendaciones" class="libros-grid">
+        <p class="estado-vacio">Estamos preparando tus recomendaciones...</p>
+      </div>
+      <button type="button" class="boton-secundario" data-vista="formulario">
+        Cambiar mis preferencias
+      </button>
     </section>
   </main>
 </Layout>
 
+<script type="application/json" id="datos-libros" set:html={JSON.stringify(libros)}></script>
+
 <script>
   import { supabase } from "../lib/supabase.js";
 
-  const base = "/biblioschool/";
+  const base = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+
+  const datosLibros = document.querySelector("#datos-libros");
+  const libros = JSON.parse(datosLibros?.textContent || "[]");
 
   const saludo = document.querySelector("#saludo");
   const correoUsuario = document.querySelector("#correo-usuario");
   const cerrarSesion = document.querySelector("#cerrar-sesion");
+  const mensajeGeneral = document.querySelector("#mensaje-general");
+
+  const formulario = document.querySelector("#form-gustos");
+  const descripcionGustos = document.querySelector("#descripcion-gustos");
+  const extensionPreferida = document.querySelector("#extension-preferida");
+  const mensajeGustos = document.querySelector("#mensaje-gustos");
+  const botonGuardar = document.querySelector("#guardar-gustos");
+
+  const vistaPerfil = document.querySelector("#vista-perfil");
+  const resumenDescripcion = document.querySelector("#resumen-descripcion");
+  const resumenGeneros = document.querySelector("#resumen-generos");
+  const resumenTipos = document.querySelector("#resumen-tipos");
+  const resumenExtension = document.querySelector("#resumen-extension");
+
+  const recomendaciones = document.querySelector("#recomendaciones");
+  const listaMeGusta = document.querySelector("#lista-me-gusta");
+  const listaLeerDespues = document.querySelector("#lista-leer-despues");
+  const listaResenas = document.querySelector("#lista-resenas");
+
+  let usuarioActual = null;
+  let preferenciasActuales = {};
+
+  function mostrarMensaje(elemento, mensaje, tipo = "") {
+    elemento.textContent = mensaje;
+    elemento.className = tipo
+      ? `mensaje-formulario ${tipo}`
+      : "mensaje-formulario";
+  }
+
+  function mostrarVista(nombre) {
+    document.querySelectorAll(".vista").forEach((vista) => {
+      vista.hidden = true;
+    });
+
+    const destino = document.querySelector(`#vista-${nombre}`);
+    if (destino) destino.hidden = false;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.querySelectorAll("[data-vista]").forEach((boton) => {
+    boton.addEventListener("click", () => {
+      mostrarVista(boton.dataset.vista);
+    });
+  });
+
+  document.querySelectorAll("[data-volver]").forEach((boton) => {
+    boton.addEventListener("click", () => mostrarVista("perfil"));
+  });
+
+  document.querySelector("#editar-perfil").addEventListener("click", () => {
+    mostrarVista("formulario");
+  });
+
+  function obtenerSeleccionados(nombre) {
+    return Array.from(
+      document.querySelectorAll(`input[name="${nombre}"]:checked`)
+    ).map((input) => input.value);
+  }
+
+  function seleccionarOpciones(nombre, valores) {
+    document.querySelectorAll(`input[name="${nombre}"]`).forEach((input) => {
+      input.checked = valores.includes(input.value);
+    });
+  }
+
+  function buscarLibro(id) {
+    return libros.find((libro) => Number(libro.id) === Number(id));
+  }
+
+  function crearTarjeta(libro) {
+    const articulo = document.createElement("article");
+    articulo.className = "libro-card";
+
+    const enlacePortada = document.createElement("a");
+    enlacePortada.href = `${base}libro/${libro.id}/`;
+    enlacePortada.className = "portada-link";
+
+    const contenedorPortada = document.createElement("div");
+    contenedorPortada.className = "portada";
+
+    const imagen = document.createElement("img");
+    imagen.src = libro.portada || `${base}placeholder-libro.svg`;
+    imagen.alt = `Portada de ${libro.titulo}`;
+    imagen.loading = "lazy";
+    imagen.onerror = () => {
+      imagen.onerror = null;
+      imagen.src = `${base}placeholder-libro.svg`;
+    };
+
+    contenedorPortada.append(imagen);
+    enlacePortada.append(contenedorPortada);
+
+    const informacion = document.createElement("div");
+    informacion.className = "informacion";
+
+    const categoria = document.createElement("span");
+    categoria.className = "categoria";
+    categoria.textContent = libro.categoria || "Libro";
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = libro.titulo;
+
+    const autor = document.createElement("p");
+    autor.textContent = libro.autor;
+
+    const enlace = document.createElement("a");
+    enlace.href = `${base}libro/${libro.id}/`;
+    enlace.className = "boton-libro";
+    enlace.textContent = "Ver libro →";
+
+    informacion.append(categoria, titulo, autor, enlace);
+    articulo.append(enlacePortada, informacion);
+
+    return articulo;
+  }
+
+  function mostrarLibros(contenedor, ids, mensajeVacio) {
+    contenedor.replaceChildren();
+
+    const encontrados = ids.map(buscarLibro).filter(Boolean);
+
+    if (!encontrados.length) {
+      const mensaje = document.createElement("p");
+      mensaje.className = "estado-vacio";
+      mensaje.textContent = mensajeVacio;
+      contenedor.append(mensaje);
+      return;
+    }
+
+    encontrados.forEach((libro) => {
+      contenedor.append(crearTarjeta(libro));
+    });
+  }
+
+  function actualizarResumen(preferencias = {}) {
+    const descripcion = preferencias.descripcion_gustos?.trim();
+    const generos = preferencias.generos_favoritos || [];
+    const tipos = preferencias.tipo_historias || [];
+    const extension = preferencias.extension_preferida || "Cualquiera";
+
+    resumenDescripcion.textContent =
+      descripcion || "Todavía no has escrito tu descripción de lector.";
+    resumenGeneros.textContent =
+      generos.length ? generos.join(", ") : "Aún no seleccionados";
+    resumenTipos.textContent =
+      tipos.length ? tipos.join(", ") : "Aún no seleccionadas";
+
+    const nombresExtension = {
+      Cualquiera: "Sin preferencia",
+      Cortos: "Libros cortos",
+      Medianos: "Libros medianos",
+      Largos: "Libros largos"
+    };
+
+    resumenExtension.textContent =
+      nombresExtension[extension] || extension;
+  }
+
+  async function cargarPreferencias() {
+    const { data, error } = await supabase
+      .from("perfiles_lectores")
+      .select("*")
+      .eq("usuario_id", usuarioActual.id)
+      .maybeSingle();
+
+    if (error) {
+      mostrarMensaje(
+        mensajeGeneral,
+        "No pudimos cargar tus preferencias. Puedes intentarlo de nuevo más tarde.",
+        "error"
+      );
+      console.error(error);
+      actualizarResumen();
+      mostrarRecomendaciones();
+      return;
+    }
+
+    preferenciasActuales = data || {};
+
+    descripcionGustos.value = data?.descripcion_gustos || "";
+    extensionPreferida.value = data?.extension_preferida || "Cualquiera";
+
+    seleccionarOpciones("genero", data?.generos_favoritos || []);
+    seleccionarOpciones("tipo-historia", data?.tipo_historias || []);
+
+    actualizarResumen(preferenciasActuales);
+    mostrarRecomendaciones(preferenciasActuales);
+  }
+
+  function mostrarRecomendaciones(preferencias = {}) {
+    const generos =
+      preferencias.generos_favoritos || obtenerSeleccionados("genero");
+    const descripcion = (
+      preferencias.descripcion_gustos ?? descripcionGustos.value ?? ""
+    ).toLowerCase();
+    const tipos =
+      preferencias.tipo_historias || obtenerSeleccionados("tipo-historia");
+
+    const palabras = descripcion
+      .split(/[^a-záéíóúüñ]+/i)
+      .filter((palabra) => palabra.length >= 4);
+
+    const puntuaciones = libros.map((libro) => {
+      let puntos = 0;
+
+      const categoria = (libro.categoria || "").toLowerCase();
+      const textoLibro = [
+        libro.titulo,
+        libro.autor,
+        libro.categoria,
+        libro.resumen,
+        libro.sobre
+      ].join(" ").toLowerCase();
+
+      generos.forEach((genero) => {
+        if (categoria.includes(genero.toLowerCase())) puntos += 4;
+        if (textoLibro.includes(genero.toLowerCase())) puntos += 2;
+      });
+
+      palabras.forEach((palabra) => {
+        if (textoLibro.includes(palabra)) puntos += 1;
+      });
+
+      tipos.forEach((tipo) => {
+        tipo.toLowerCase().split(" ").forEach((palabra) => {
+          if (palabra.length > 4 && textoLibro.includes(palabra)) puntos += 1;
+        });
+      });
+
+      return { id: libro.id, puntos };
+    });
+
+    puntuaciones.sort((a, b) => b.puntos - a.puntos);
+
+    let ids = puntuaciones
+      .filter((item) => item.puntos > 0)
+      .slice(0, 6)
+      .map((item) => item.id);
+
+    if (!ids.length) {
+      ids = libros.slice(0, 6).map((libro) => libro.id);
+    }
+
+    mostrarLibros(
+      recomendaciones,
+      ids,
+      "Completa tus gustos para recibir recomendaciones."
+    );
+  }
+
+  formulario.addEventListener("submit", async (evento) => {
+    evento.preventDefault();
+
+    botonGuardar.disabled = true;
+    botonGuardar.textContent = "Guardando...";
+    mostrarMensaje(mensajeGustos, "");
+
+    const preferencias = {
+      usuario_id: usuarioActual.id,
+      descripcion_gustos: descripcionGustos.value.trim(),
+      generos_favoritos: obtenerSeleccionados("genero"),
+      tipo_historias: obtenerSeleccionados("tipo-historia"),
+      extension_preferida: extensionPreferida.value,
+      actualizado_en: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from("perfiles_lectores")
+      .upsert(preferencias, { onConflict: "usuario_id" });
+
+    botonGuardar.disabled = false;
+    botonGuardar.textContent = "Guardar mis gustos";
+
+    if (error) {
+      mostrarMensaje(
+        mensajeGustos,
+        "No se pudieron guardar tus gustos. Inténtalo otra vez.",
+        "error"
+      );
+      console.error(error);
+      return;
+    }
+
+    preferenciasActuales = preferencias;
+    actualizarResumen(preferencias);
+    mostrarRecomendaciones(preferencias);
+
+    mostrarMensaje(
+      mensajeGustos,
+      "¡Tus gustos se guardaron correctamente!",
+      "exito"
+    );
+  });
+
+  async function cargarMeGusta() {
+    const { data, error } = await supabase
+      .from("libros_me_gusta")
+      .select("libro_id")
+      .eq("usuario_id", usuarioActual.id);
+
+    if (error) {
+      listaMeGusta.textContent = "No pudimos cargar tus Me gusta.";
+      console.error(error);
+      return;
+    }
+
+    mostrarLibros(
+      listaMeGusta,
+      (data || []).map((fila) => fila.libro_id),
+      "Todavía no has dado Me gusta a ningún libro. Explora el catálogo y marca tus favoritos."
+    );
+  }
+
+  async function cargarLeerDespues() {
+    const { data, error } = await supabase
+      .from("libros_leer_despues")
+      .select("libro_id")
+      .eq("usuario_id", usuarioActual.id);
+
+    if (error) {
+      listaLeerDespues.textContent = "No pudimos cargar tus libros guardados.";
+      console.error(error);
+      return;
+    }
+
+    mostrarLibros(
+      listaLeerDespues,
+      (data || []).map((fila) => fila.libro_id),
+      "Todavía no has guardado libros para leer más tarde."
+    );
+  }
+
+  async function cargarMisResenas() {
+    const { data, error } = await supabase
+      .from("reseñas_libros")
+      .select("*")
+      .eq("usuario_id", usuarioActual.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      listaResenas.textContent = "No pudimos cargar tus reseñas.";
+      console.error(error);
+      return;
+    }
+
+    listaResenas.replaceChildren();
+
+    if (!data || !data.length) {
+      const vacio = document.createElement("p");
+      vacio.className = "estado-vacio";
+      vacio.textContent =
+        "Todavía no has publicado reseñas. Entra a un libro para compartir tu opinión.";
+      listaResenas.append(vacio);
+      return;
+    }
+
+    data.forEach((resena) => {
+      const libro = buscarLibro(resena.libro_id);
+      const articulo = document.createElement("article");
+      articulo.className = "resena-personal";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = libro
+        ? libro.titulo
+        : `Libro ${resena.libro_id}`;
+
+      const estrellas = document.createElement("p");
+      estrellas.className = "estrellas-resena";
+      estrellas.textContent = "★".repeat(
+        Math.max(0, Math.min(5, Number(resena.calificacion) || 0))
+      );
+
+      const comentario = document.createElement("p");
+      comentario.textContent =
+        resena.comentario || resena.resena || resena.contenido || "";
+
+      articulo.append(titulo, estrellas, comentario);
+
+      if (libro) {
+        const enlace = document.createElement("a");
+        enlace.href = `${base}libro/${libro.id}/`;
+        enlace.textContent = "Volver al libro →";
+        articulo.append(enlace);
+      }
+
+      listaResenas.append(articulo);
+    });
+  }
+
+  cerrarSesion.addEventListener("click", async () => {
+    cerrarSesion.disabled = true;
+    cerrarSesion.textContent = "Cerrando sesión...";
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      cerrarSesion.disabled = false;
+      cerrarSesion.textContent = "Cerrar sesión";
+      mensajeGeneral.textContent =
+        "No se pudo cerrar sesión. Intenta otra vez.";
+      return;
+    }
+
+    window.location.href = `${base}login/`;
+  });
 
   async function cargarCuenta() {
     const { data, error } = await supabase.auth.getSession();
@@ -86,60 +625,68 @@ const base = "/biblioschool/";
       return;
     }
 
-    const usuario = data.session.user;
+    usuarioActual = data.session.user;
 
-    const nombreUsuario =
-      usuario.user_metadata?.nombre_usuario ||
-      usuario.user_metadata?.nombre_completo ||
-      usuario.email?.split("@")[0] ||
+    const nombre =
+      usuarioActual.user_metadata?.nombre_usuario ||
+      usuarioActual.user_metadata?.nombre_completo ||
+      usuarioActual.email?.split("@")[0] ||
       "Usuario";
 
-    saludo.textContent = `Bienvenido, ${nombreUsuario}.`;
-    correoUsuario.textContent = usuario.email || "";
+    saludo.textContent = `Bienvenido, ${nombre}. Este es tu espacio de lectura.`;
+    correoUsuario.textContent = usuarioActual.email || "";
+
+    await cargarPreferencias();
+
+    await Promise.all([
+      cargarMeGusta(),
+      cargarLeerDespues(),
+      cargarMisResenas()
+    ]);
   }
-
-  cerrarSesion?.addEventListener("click", async () => {
-    cerrarSesion.disabled = true;
-    cerrarSesion.textContent = "Cerrando sesión...";
-
-    await supabase.auth.signOut();
-
-    window.location.href = `${base}login/`;
-  });
 
   cargarCuenta();
 </script>
 
 <style>
+  [hidden] {
+    display: none !important;
+  }
+
   .cuenta {
-    max-width: 1200px;
+    max-width: 1050px;
     margin: 0 auto;
-    padding: 60px 24px 90px;
+    padding: 50px 24px 90px;
+    color: #302b26;
   }
 
   .bienvenida {
     background: #302b26;
     color: white;
     border-radius: 26px;
-    padding: 40px;
+    padding: 38px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 55px;
+    gap: 24px;
+    margin-bottom: 28px;
   }
 
   .etiqueta {
-    color: #c6a77a;
-    font-size: 0.75rem;
+    color: #a48751;
+    font-size: .75rem;
     font-weight: 800;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     margin: 0 0 10px;
+  }
+
+  .bienvenida .etiqueta {
+    color: #c6a77a;
   }
 
   .bienvenida h1 {
     margin: 0;
-    font-size: clamp(2.3rem, 5vw, 4rem);
+    font-size: clamp(2.3rem, 5vw, 3.6rem);
   }
 
   .bienvenida p {
@@ -148,7 +695,7 @@ const base = "/biblioschool/";
 
   .correo {
     color: #cfc6bd;
-    font-size: 0.9rem;
+    font-size: .9rem;
   }
 
   .boton-salir {
@@ -166,46 +713,273 @@ const base = "/biblioschool/";
     color: #302b26;
   }
 
-  .titulo-seccion {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 20px;
-    margin-bottom: 28px;
+  .panel {
+    padding: 30px;
+    background: #fffdf9;
+    border: 1px solid #e5ddd3;
+    border-radius: 22px;
   }
 
-  .titulo-seccion h2 {
+  .perfil-panel {
+    margin-bottom: 24px;
+  }
+
+  .panel h2 {
     color: #29241f;
-    margin: 0;
+    margin: 0 0 12px;
+    font-size: clamp(1.6rem, 4vw, 2rem);
+  }
+
+  .descripcion-seccion {
+    color: #71675e;
+    line-height: 1.7;
+    margin: 0 0 22px;
+  }
+
+  .descripcion-lector {
+    margin-top: 26px;
+    padding: 22px;
+    background: #f7f1e9;
+    border: 1px solid #e5ddd3;
+    border-radius: 16px;
+  }
+
+  .descripcion-lector h3 {
+    margin-top: 0;
+    color: #183c32;
+  }
+
+  .descripcion-lector p {
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  .descripcion-lector strong {
+    color: #51483f;
+  }
+
+  .opciones-cuenta {
+    display: grid;
+    gap: 14px;
+  }
+
+  .opcion-cuenta {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding: 20px;
+    border: 1px solid #e5ddd3;
+    border-radius: 17px;
+    background: #fffdf9;
+    color: #302b26;
+    text-align: left;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+
+  .opcion-cuenta:hover {
+    transform: translateY(-2px);
+    border-color: #c6a77a;
+    box-shadow: 0 8px 22px rgba(50, 40, 30, .07);
+  }
+
+  .icono {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .opcion-formulario {
+    background: #f0e4d5;
+    color: #70482f;
+  }
+
+  .opcion-gustos {
+    background: #f8e2e2;
+    color: #b84040;
+  }
+
+  .opcion-despues {
+    background: #e1eaf5;
+    color: #3e638e;
+  }
+
+  .opcion-resenas {
+    background: #e4eddf;
+    color: #4c7047;
+  }
+
+  .opcion-recomendaciones {
+    background: #eee5f6;
+    color: #77539a;
+  }
+
+  .texto-opcion {
+    flex: 1;
+    display: grid;
+    gap: 5px;
+  }
+
+  .texto-opcion strong {
+    font-size: 1rem;
+  }
+
+  .texto-opcion small {
+    color: #71675e;
+    font-size: .88rem;
+    line-height: 1.5;
+  }
+
+  .flecha {
+    color: #8b7d6e;
     font-size: 2rem;
   }
 
-  .cantidad {
-    background: #eee7df;
-    color: #665d55;
-    padding: 9px 15px;
-    border-radius: 20px;
-    font-size: 0.85rem;
+  .boton-volver {
+    margin-bottom: 28px;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: #183c32;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  form label {
+    display: block;
+    font-weight: 700;
+    margin: 22px 0 9px;
+  }
+
+  textarea,
+  select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    border: 1px solid #d9d0c5;
+    border-radius: 10px;
+    background: white;
+    color: #302b26;
+    font: inherit;
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  textarea:focus,
+  select:focus {
+    outline: 2px solid #c6a77a;
+    border-color: #a48751;
+  }
+
+  .opciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .opcion {
+    margin: 0 !important;
+    cursor: pointer;
+  }
+
+  .opcion input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .opcion span {
+    display: inline-block;
+    padding: 10px 14px;
+    border: 1px solid #d9d0c5;
+    border-radius: 24px;
+    background: white;
+    color: #51483f;
+    font-size: .9rem;
+    transition: .2s;
+  }
+
+  .opcion input:checked + span {
+    background: #183c32;
+    border-color: #183c32;
+    color: white;
+  }
+
+  .opcion input:focus-visible + span {
+    outline: 2px solid #a48751;
+    outline-offset: 3px;
+  }
+
+  .boton-principal,
+  .boton-secundario {
+    margin-top: 24px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #183c32;
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .boton-secundario {
+    background: #302b26;
+  }
+
+  .boton-principal:disabled {
+    opacity: .6;
+    cursor: wait;
+  }
+
+  .mensaje-formulario,
+  .mensaje-general {
+    line-height: 1.5;
+  }
+
+  .mensaje-formulario:empty,
+  .mensaje-general:empty {
+    display: none;
+  }
+
+  .error {
+    color: #b42318;
+  }
+
+  .exito {
+    color: #197044;
   }
 
   .libros-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 24px;
   }
 
   .libro-card {
-    background: #fffdf9;
+    background: white;
     border: 1px solid #e5ddd3;
-    border-radius: 18px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(50, 40, 30, 0.06);
-    transition: 0.25s;
+    box-shadow: 0 8px 25px rgba(50, 40, 30, .05);
+    transition: .25s;
   }
 
   .libro-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 35px rgba(50, 40, 30, 0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(50, 40, 30, .1);
   }
 
   .portada-link {
@@ -213,16 +987,16 @@ const base = "/biblioschool/";
   }
 
   .portada {
-    height: 300px;
-    background: #eee7df;
+    height: 250px;
     overflow: hidden;
+    background: #eee7df;
   }
 
   .portada img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
   }
 
   .informacion {
@@ -231,7 +1005,7 @@ const base = "/biblioschool/";
 
   .categoria {
     color: #9a7951;
-    font-size: 0.7rem;
+    font-size: .7rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -240,13 +1014,13 @@ const base = "/biblioschool/";
   .informacion h3 {
     color: #29241f;
     font-size: 1.05rem;
-    line-height: 1.3;
+    line-height: 1.4;
     margin: 8px 0 5px;
   }
 
   .informacion p {
     color: #71675e;
-    font-size: 0.88rem;
+    font-size: .88rem;
     margin: 0 0 16px;
   }
 
@@ -256,9 +1030,9 @@ const base = "/biblioschool/";
     text-decoration: none;
     background: #302b26;
     color: white;
-    padding: 10px;
+    padding: 11px;
     border-radius: 9px;
-    font-size: 0.82rem;
+    font-size: .85rem;
     font-weight: 700;
   }
 
@@ -266,30 +1040,86 @@ const base = "/biblioschool/";
     background: #574b40;
   }
 
-  @media (max-width: 1000px) {
-    .libros-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .estado-vacio {
+    grid-column: 1 / -1;
+    color: #71675e;
+    line-height: 1.7;
+    padding: 16px 0;
   }
 
-  @media (max-width: 700px) {
+  .corazon,
+  .estrellas-resena {
+    color: #c83c4a;
+  }
+
+  .lista-resenas {
+    display: grid;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .resena-personal {
+    padding: 20px;
+    border: 1px solid #e5ddd3;
+    border-radius: 14px;
+    background: white;
+  }
+
+  .resena-personal h3 {
+    margin-top: 0;
+    color: #183c32;
+  }
+
+  .resena-personal p {
+    color: #665d55;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  .resena-personal a {
+    color: #183c32;
+    font-weight: 700;
+  }
+
+  @media (max-width: 750px) {
+    .libros-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .bienvenida {
       flex-direction: column;
       align-items: flex-start;
     }
+  }
+
+  @media (max-width: 520px) {
+    .cuenta {
+      padding: 30px 14px 60px;
+    }
+
+    .bienvenida,
+    .panel {
+      padding: 22px;
+      border-radius: 17px;
+    }
+
+    .opcion-cuenta {
+      padding: 15px;
+      gap: 12px;
+    }
+
+    .icono {
+      flex-basis: 42px;
+      width: 42px;
+      height: 42px;
+    }
 
     .libros-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
     }
 
     .portada {
-      height: 260px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .libros-grid {
-      grid-template-columns: 1fr;
+      height: 300px;
     }
   }
 </style>
