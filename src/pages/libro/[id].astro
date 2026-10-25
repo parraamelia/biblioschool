@@ -20,9 +20,7 @@ const { libro } = Astro.props;
   descripcion={`Información, resumen y reseñas de ${libro.titulo}.`}
 >
   <main class="detalle">
-    <a href={`${base}catalogo/`} class="volver">
-      ← Volver al catálogo
-    </a>
+    <a href={`${base}catalogo/`} class="volver">← Volver al catálogo</a>
 
     <section class="libro-principal">
       <div class="portada">
@@ -35,33 +33,16 @@ const { libro } = Astro.props;
         <h2>{libro.autor}</h2>
 
         <div class="datos">
-          <div>
-            <strong>Año</strong>
-            <span>{libro.anio}</span>
-          </div>
-          <div>
-            <strong>Páginas</strong>
-            <span>{libro.paginas ?? "No especificado"}</span>
-          </div>
-          <div>
-            <strong>ISBN</strong>
-            <span>{libro.isbn}</span>
-          </div>
+          <div><strong>Año</strong><span>{libro.anio}</span></div>
+          <div><strong>Páginas</strong><span>{libro.paginas || "No especificado"}</span></div>
+          <div><strong>ISBN</strong><span>{libro.isbn}</span></div>
         </div>
 
         <div class="acciones-libro">
-          <button id="boton-leer-despues" type="button" disabled>
-            <span id="icono-leer-despues">＋</span>
-            <span id="texto-leer-despues">Leer más tarde</span>
-          </button>
-
-          <button id="boton-me-gusta" type="button" aria-pressed="false" disabled>
-            <span id="icono-me-gusta">♡</span>
-            <span id="texto-me-gusta">Me gusta</span>
-          </button>
+          <button id="boton-me-gusta" type="button">♥ Me gusta</button>
+          <button id="boton-leer-despues" type="button">＋ Leer más tarde</button>
         </div>
-
-        <p id="mensaje-acciones" class="mensaje-acciones" aria-live="polite"></p>
+        <p id="mensaje-acciones" role="status" aria-live="polite"></p>
       </div>
     </section>
 
@@ -100,11 +81,9 @@ const { libro } = Astro.props;
 
       <div class="formulario-reseña">
         <h3>¿Ya leíste este libro?</h3>
-        <p class="texto-formulario">
-          Comparte tu opinión con otros estudiantes.
-        </p>
+        <p class="texto-formulario">Comparte tu opinión con otros estudiantes.</p>
 
-        <div id="mensaje-reseña" class="mensaje" aria-live="polite"></div>
+        <div id="mensaje-reseña" class="mensaje" role="status"></div>
 
         <label for="calificacion">Tu calificación</label>
         <select id="calificacion">
@@ -116,22 +95,15 @@ const { libro } = Astro.props;
         </select>
 
         <label for="comentario">Tu reseña</label>
-        <textarea
-          id="comentario"
-          rows="6"
-          placeholder="Escribe qué te pareció el libro, qué te gustó o qué aprendiste de él..."
-        ></textarea>
+        <textarea id="comentario" rows="6" maxlength="2000"
+          placeholder="Escribe qué te pareció el libro, qué te gustó o qué aprendiste..."></textarea>
 
-        <button id="publicar-reseña" type="button">
-          Publicar reseña
-        </button>
+        <button id="publicar-reseña" type="button">Publicar reseña</button>
       </div>
     </section>
 
     <div class="final">
-      <a href={`${base}catalogo/`} class="boton-explorar">
-        Explorar más libros
-      </a>
+      <a href={`${base}catalogo/`} class="boton-explorar">Explorar más libros</a>
     </div>
   </main>
 </Layout>
@@ -143,221 +115,155 @@ const { libro } = Astro.props;
     window.location.pathname.split("/").filter(Boolean).pop()
   );
 
-  const botonLeer = document.querySelector("#boton-leer-despues");
-  const textoLeer = document.querySelector("#texto-leer-despues");
-  const iconoLeer = document.querySelector("#icono-leer-despues");
-  const botonMeGusta = document.querySelector("#boton-me-gusta");
-  const textoMeGusta = document.querySelector("#texto-me-gusta");
-  const iconoMeGusta = document.querySelector("#icono-me-gusta");
-  const mensajeAcciones = document.querySelector("#mensaje-acciones");
+  const base = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
 
-  const listaResenas = document.querySelector("#lista-reseñas");
-  const promedio = document.querySelector("#promedio");
-  const estrellasPromedio = document.querySelector("#estrellas-promedio");
-  const cantidadResenas = document.querySelector("#cantidad-reseñas");
-  const calificacion = document.querySelector("#calificacion");
-  const comentario = document.querySelector("#comentario");
-  const publicar = document.querySelector("#publicar-reseña");
-  const mensajeResena = document.querySelector("#mensaje-reseña");
+  const botonMeGusta = document.querySelector<HTMLButtonElement>("#boton-me-gusta")!;
+  const botonLeerDespues = document.querySelector<HTMLButtonElement>("#boton-leer-despues")!;
+  const mensajeAcciones = document.querySelector<HTMLElement>("#mensaje-acciones")!;
 
-  let usuarioActual = null;
-  let guardadoParaDespues = false;
-  let meGusta = false;
-  let procesandoLeer = false;
-  let procesandoMeGusta = false;
+  const listaResenas = document.querySelector<HTMLElement>("#lista-reseñas")!;
+  const promedio = document.querySelector<HTMLElement>("#promedio")!;
+  const estrellasPromedio = document.querySelector<HTMLElement>("#estrellas-promedio")!;
+  const cantidadResenas = document.querySelector<HTMLElement>("#cantidad-reseñas")!;
+  const calificacion = document.querySelector<HTMLSelectElement>("#calificacion")!;
+  const comentario = document.querySelector<HTMLTextAreaElement>("#comentario")!;
+  const publicar = document.querySelector<HTMLButtonElement>("#publicar-reseña")!;
+  const mensajeResena = document.querySelector<HTMLElement>("#mensaje-reseña")!;
 
-  function mostrarEstrellas(numero) {
-    const cantidad = Math.max(0, Math.min(5, Math.round(Number(numero))));
+  let usuarioActual: { id: string; email?: string; user_metadata?: Record<string, any> } | null = null;
+  let tieneMeGusta = false;
+  let guardadoDespues = false;
+
+  function mostrarEstrellas(numero: number) {
+    const cantidad = Math.max(0, Math.min(5, Math.round(Number(numero) || 0)));
     return "★".repeat(cantidad) + "☆".repeat(5 - cantidad);
   }
 
-  function escaparTexto(texto) {
+  function mostrarMensajeAcciones(texto: string) {
+    mensajeAcciones.textContent = texto;
+  }
+
+  function escaparTexto(texto: unknown) {
     const div = document.createElement("div");
-    div.textContent = texto ?? "";
+    div.textContent = String(texto ?? "");
     return div.innerHTML;
   }
 
-  function actualizarBotonLeer() {
-    textoLeer.textContent = guardadoParaDespues
-      ? "Quitar de Leer más tarde"
-      : "Leer más tarde";
-
-    iconoLeer.textContent = guardadoParaDespues ? "✓" : "＋";
-    botonLeer.classList.toggle("activo", guardadoParaDespues);
-    botonLeer.setAttribute("aria-pressed", String(guardadoParaDespues));
-  }
-
-  function actualizarBotonMeGusta() {
-    textoMeGusta.textContent = meGusta ? "Te gusta" : "Me gusta";
-    iconoMeGusta.textContent = meGusta ? "♥" : "♡";
-    botonMeGusta.classList.toggle("activo", meGusta);
-    botonMeGusta.setAttribute("aria-pressed", String(meGusta));
-  }
-
-  async function comprobarSesion() {
+  async function comprobarUsuario() {
     const { data, error } = await supabase.auth.getSession();
 
     if (error) {
-      mensajeAcciones.textContent = "No se pudo comprobar tu sesión.";
+      mostrarMensajeAcciones("No pudimos comprobar tu sesión. Actualiza la página.");
       return null;
     }
 
     usuarioActual = data.session?.user ?? null;
+
+    if (!usuarioActual) {
+      botonMeGusta.textContent = "♥ Me gusta";
+      botonLeerDespues.textContent = "＋ Leer más tarde";
+      return null;
+    }
+
     return usuarioActual;
   }
 
-  async function cargarEstadoLibro() {
-    const usuario = await comprobarSesion();
+  async function cargarEstadoBotones() {
+    const usuario = await comprobarUsuario();
 
-    if (!usuario) {
-      botonLeer.disabled = false;
-      botonMeGusta.disabled = false;
+    if (!usuario) return;
 
-      mensajeAcciones.textContent =
-        "Inicia sesión para guardar libros o marcar que te gustan.";
-
-      return;
-    }
-
-    const [resultadoLeer, resultadoMeGusta] = await Promise.all([
-      supabase
-        .from("libros_leer_despues")
-        .select("id")
+    const [meGusta, leerDespues] = await Promise.all([
+      supabase.from("libros_me_gusta")
+        .select("libro_id")
         .eq("usuario_id", usuario.id)
         .eq("libro_id", libroId)
         .maybeSingle(),
 
-      supabase
-        .from("libros_me_gusta")
-        .select("id")
+      supabase.from("libros_leer_despues")
+        .select("libro_id")
         .eq("usuario_id", usuario.id)
         .eq("libro_id", libroId)
         .maybeSingle()
     ]);
 
-    if (resultadoLeer.error) {
-      console.error("Error al consultar Leer más tarde:", resultadoLeer.error);
-    } else {
-      guardadoParaDespues = Boolean(resultadoLeer.data);
-      actualizarBotonLeer();
+    if (meGusta.error || leerDespues.error) {
+      console.error(meGusta.error || leerDespues.error);
+      mostrarMensajeAcciones("No pudimos cargar tus botones. Revisa las tablas y políticas de Supabase.");
+      return;
     }
 
-    if (resultadoMeGusta.error) {
-      console.error("Error al consultar Me gusta:", resultadoMeGusta.error);
-    } else {
-      meGusta = Boolean(resultadoMeGusta.data);
-      actualizarBotonMeGusta();
-    }
+    tieneMeGusta = Boolean(meGusta.data);
+    guardadoDespues = Boolean(leerDespues.data);
 
-    botonLeer.disabled = false;
-    botonMeGusta.disabled = false;
+    actualizarBotones();
   }
 
-  botonLeer?.addEventListener("click", async () => {
-    if (procesandoLeer) return;
+  function actualizarBotones() {
+    botonMeGusta.textContent = tieneMeGusta ? "♥ Te gusta" : "♡ Me gusta";
+    botonLeerDespues.textContent = guardadoDespues
+      ? "✓ Guardado para después"
+      : "＋ Leer más tarde";
 
-    mensajeAcciones.textContent = "";
+    botonMeGusta.classList.toggle("activo", tieneMeGusta);
+    botonLeerDespues.classList.toggle("activo", guardadoDespues);
+  }
 
-    const usuario = await comprobarSesion();
+  async function cambiarGuardado(tipo: "me-gusta" | "despues") {
+    const usuario = await comprobarUsuario();
 
     if (!usuario) {
-      mensajeAcciones.textContent =
-        "Debes iniciar sesión para guardar libros.";
+      mostrarMensajeAcciones(`Inicia sesión para ${tipo === "me-gusta" ? "marcar Me gusta" : "guardar libros para después"}.`);
       return;
     }
 
-    procesandoLeer = true;
-    botonLeer.disabled = true;
+    const esMeGusta = tipo === "me-gusta";
+    const estaGuardado = esMeGusta ? tieneMeGusta : guardadoDespues;
+    const tabla = esMeGusta ? "libros_me_gusta" : "libros_leer_despues";
+    const boton = esMeGusta ? botonMeGusta : botonLeerDespues;
 
-    try {
-      if (guardadoParaDespues) {
-        const { error } = await supabase
-          .from("libros_leer_despues")
-          .delete()
-          .eq("usuario_id", usuario.id)
-          .eq("libro_id", libroId);
+    boton.disabled = true;
+    mostrarMensajeAcciones("Guardando cambios...");
 
-        if (error) throw error;
+    let error;
 
-        guardadoParaDespues = false;
-        mensajeAcciones.textContent = "Libro quitado de Leer más tarde.";
-      } else {
-        const { error } = await supabase
-          .from("libros_leer_despues")
-          .insert({
-            usuario_id: usuario.id,
-            libro_id: libroId
-          });
-
-        if (error) throw error;
-
-        guardadoParaDespues = true;
-        mensajeAcciones.textContent = "Libro guardado para leer más tarde.";
-      }
-
-      actualizarBotonLeer();
-    } catch (error) {
-      console.error(error);
-      mensajeAcciones.textContent =
-        "No se pudo actualizar el libro. Inténtalo nuevamente.";
-    } finally {
-      procesandoLeer = false;
-      botonLeer.disabled = false;
+    if (estaGuardado) {
+      const resultado = await supabase
+        .from(tabla)
+        .delete()
+        .eq("usuario_id", usuario.id)
+        .eq("libro_id", libroId);
+      error = resultado.error;
+    } else {
+      const resultado = await supabase
+        .from(tabla)
+        .insert({ usuario_id: usuario.id, libro_id: libroId });
+      error = resultado.error;
     }
-  });
 
-  botonMeGusta?.addEventListener("click", async () => {
-    if (procesandoMeGusta) return;
+    boton.disabled = false;
 
-    mensajeAcciones.textContent = "";
-
-    const usuario = await comprobarSesion();
-
-    if (!usuario) {
-      mensajeAcciones.textContent =
-        "Debes iniciar sesión para marcar Me gusta.";
+    if (error) {
+      console.error(error);
+      mostrarMensajeAcciones("No se pudo guardar el cambio. Comprueba las tablas y políticas de Supabase.");
       return;
     }
 
-    procesandoMeGusta = true;
-    botonMeGusta.disabled = true;
-
-    try {
-      if (meGusta) {
-        const { error } = await supabase
-          .from("libros_me_gusta")
-          .delete()
-          .eq("usuario_id", usuario.id)
-          .eq("libro_id", libroId);
-
-        if (error) throw error;
-
-        meGusta = false;
-        mensajeAcciones.textContent = "Quitaste tu Me gusta.";
-      } else {
-        const { error } = await supabase
-          .from("libros_me_gusta")
-          .insert({
-            usuario_id: usuario.id,
-            libro_id: libroId
-          });
-
-        if (error) throw error;
-
-        meGusta = true;
-        mensajeAcciones.textContent = "Marcaste que te gusta este libro.";
-      }
-
-      actualizarBotonMeGusta();
-    } catch (error) {
-      console.error(error);
-      mensajeAcciones.textContent =
-        "No se pudo actualizar Me gusta. Inténtalo nuevamente.";
-    } finally {
-      procesandoMeGusta = false;
-      botonMeGusta.disabled = false;
+    if (esMeGusta) {
+      tieneMeGusta = !estaGuardado;
+    } else {
+      guardadoDespues = !estaGuardado;
     }
-  });
+
+    actualizarBotones();
+    mostrarMensajeAcciones(
+      estaGuardado
+        ? "Se quitó de tu lista."
+        : "¡Se guardó correctamente en tu cuenta!"
+    );
+  }
 
   async function cargarResenas() {
     const { data, error } = await supabase
@@ -368,8 +274,7 @@ const { libro } = Astro.props;
 
     if (error) {
       console.error(error);
-      listaResenas.innerHTML =
-        '<p class="sin-resenas">No se pudieron cargar las reseñas.</p>';
+      listaResenas.textContent = "No se pudieron cargar las reseñas.";
       return;
     }
 
@@ -377,85 +282,59 @@ const { libro } = Astro.props;
       promedio.textContent = "0.0";
       estrellasPromedio.textContent = "☆☆☆☆☆";
       cantidadResenas.textContent = "Todavía no hay reseñas";
-
       listaResenas.innerHTML = `
         <div class="sin-resenas">
-          <div class="icono-reseña">✦</div>
           <h3>Aún no hay reseñas</h3>
-          <p>Sé la primera persona en compartir su opinión sobre este libro.</p>
-        </div>
-      `;
+          <p>Sé la primera persona en compartir su opinión.</p>
+        </div>`;
       return;
     }
 
-    const total = data.reduce(
-      (suma, resena) => suma + Number(resena.calificacion),
-      0
-    );
+    const total = data.reduce((suma, resena) => suma + Number(resena.calificacion || 0), 0);
+    const media = total / data.length;
 
-    const promedioNumero = total / data.length;
-    promedio.textContent = promedioNumero.toFixed(1);
-    estrellasPromedio.textContent = mostrarEstrellas(promedioNumero);
-    cantidadResenas.textContent =
-      data.length === 1 ? "1 reseña" : `${data.length} reseñas`;
+    promedio.textContent = media.toFixed(1);
+    estrellasPromedio.textContent = mostrarEstrellas(media);
+    cantidadResenas.textContent = data.length === 1 ? "1 reseña" : `${data.length} reseñas`;
 
     listaResenas.innerHTML = data.map((resena) => `
       <article class="resena">
         <div class="resena-superior">
           <div>
-            <strong>${escaparTexto(resena.nombre_usuario)}</strong>
+            <strong>${escaparTexto(resena.nombre_usuario || "Lector")}</strong>
             <div class="estrellas">${mostrarEstrellas(resena.calificacion)}</div>
           </div>
-          <span class="fecha">
-            ${new Date(resena.creado_en).toLocaleDateString("es-EC")}
-          </span>
+          <span class="fecha">${resena.creado_en ? new Date(resena.creado_en).toLocaleDateString("es-EC") : ""}</span>
         </div>
         <p>${escaparTexto(resena.comentario)}</p>
       </article>
     `).join("");
   }
 
-  async function comprobarUsuarioResena() {
-    const { data } = await supabase.auth.getSession();
-
-    if (!data.session) {
-      mensajeResena.textContent =
-        "Debes iniciar sesión para publicar una reseña.";
-      publicar.disabled = true;
-      return null;
-    }
-
-    return data.session.user;
-  }
-
-  publicar?.addEventListener("click", async () => {
+  publicar.addEventListener("click", async () => {
     mensajeResena.textContent = "";
+    const usuario = await comprobarUsuario();
 
-    const usuario = await comprobarUsuarioResena();
-    if (!usuario) return;
-
-    const texto = comentario.value.trim();
-
-    if (!texto) {
-      mensajeResena.textContent = "Escribe una reseña antes de publicarla.";
+    if (!usuario) {
+      mensajeResena.textContent = "Inicia sesión para publicar una reseña.";
       return;
     }
 
+    const texto = comentario.value.trim();
+
     if (texto.length < 10) {
-      mensajeResena.textContent =
-        "La reseña debe tener al menos 10 caracteres.";
+      mensajeResena.textContent = "Escribe una reseña de al menos 10 caracteres.";
       return;
     }
 
     publicar.disabled = true;
     publicar.textContent = "Publicando...";
 
-    const datosUsuario = usuario.user_metadata || {};
-    const nombre =
-      datosUsuario.nombre_usuario ||
-      datosUsuario.nombre_completo ||
+    const metadata = usuario.user_metadata || {};
+    const nombre = metadata.nombre_usuario ||
+      metadata.nombre_completo ||
       usuario.email?.split("@")[0] ||
-      "Usuario";
+      "Lector";
 
     const { error } = await supabase
       .from("reseñas_libros")
@@ -467,26 +346,25 @@ const { libro } = Astro.props;
         comentario: texto
       });
 
+    publicar.disabled = false;
+    publicar.textContent = "Publicar reseña";
+
     if (error) {
       console.error(error);
-      mensajeResena.textContent =
-        "No se pudo publicar la reseña. Inténtalo nuevamente.";
-      publicar.disabled = false;
-      publicar.textContent = "Publicar reseña";
+      mensajeResena.textContent = "No se pudo publicar la reseña. Inténtalo de nuevo.";
       return;
     }
 
     comentario.value = "";
     calificacion.value = "5";
-    mensajeResena.textContent = "¡Tu reseña fue publicada correctamente!";
-    publicar.disabled = false;
-    publicar.textContent = "Publicar reseña";
-
+    mensajeResena.textContent = "¡Tu reseña se publicó correctamente!";
     await cargarResenas();
   });
 
-  cargarEstadoLibro();
-  comprobarUsuarioResena();
+  botonMeGusta.addEventListener("click", () => cambiarGuardado("me-gusta"));
+  botonLeerDespues.addEventListener("click", () => cambiarGuardado("despues"));
+
+  cargarEstadoBotones();
   cargarResenas();
 </script>
 
@@ -517,7 +395,7 @@ const { libro } = Astro.props;
     border-radius: 20px;
     overflow: hidden;
     background: #eee7df;
-    box-shadow: 0 22px 50px rgba(40, 30, 20, 0.15);
+    box-shadow: 0 22px 50px rgba(40, 30, 20, .15);
   }
 
   .portada img {
@@ -529,7 +407,7 @@ const { libro } = Astro.props;
 
   .categoria {
     color: #9a7951;
-    font-size: 0.75rem;
+    font-size: .75rem;
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -563,64 +441,43 @@ const { libro } = Astro.props;
     min-width: 125px;
   }
 
-  .datos strong {
-    display: block;
-    color: #302b26;
-    font-size: 0.75rem;
-    margin-bottom: 5px;
-  }
-
-  .datos span {
-    color: #756b62;
-    font-size: 0.83rem;
-  }
+  .datos strong, .datos span { display: block; }
+  .datos strong { color: #302b26; font-size: .75rem; margin-bottom: 5px; }
+  .datos span { color: #756b62; font-size: .83rem; }
 
   .acciones-libro {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 25px;
+    margin-top: 28px;
   }
 
   .acciones-libro button {
-    border: 1px solid #d4b991;
+    border: 1px solid #302b26;
     border-radius: 10px;
-    background: #fffdf9;
-    color: #514334;
-    padding: 13px 16px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 800;
+    padding: 13px 18px;
+    background: white;
+    color: #302b26;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-  }
-
-  .acciones-libro button:hover:not(:disabled) {
-    background: #f2e8d9;
-    transform: translateY(-2px);
+    font: inherit;
+    font-weight: 700;
   }
 
   .acciones-libro button.activo {
-    background: #302b26;
-    border-color: #302b26;
+    background: #183c32;
+    border-color: #183c32;
     color: white;
   }
 
   .acciones-libro button:disabled {
-    opacity: 0.6;
+    opacity: .6;
     cursor: wait;
   }
 
-  #icono-me-gusta {
-    color: #b45c58;
-    font-size: 1.1rem;
-  }
-
-  .mensaje-acciones {
-    color: #80633f;
-    font-size: 0.88rem;
-    min-height: 1.2em;
-    line-height: 1.5;
+  #mensaje-acciones {
+    min-height: 24px;
+    color: #183c32;
+    font-size: .9rem;
   }
 
   .contenido-libro {
@@ -629,280 +486,56 @@ const { libro } = Astro.props;
     gap: 55px;
   }
 
-  .seccion-info {
-    max-width: 900px;
-  }
+  .seccion-info { max-width: 900px; }
+  .numero { color: #a88b67; font-size: .75rem; font-weight: 900; letter-spacing: 2px; }
+  .seccion-info h2 { color: #29241f; font-size: 2.3rem; margin: 8px 0 18px; }
+  .seccion-info p { color: #665e56; line-height: 1.9; font-size: 1.05rem; }
 
-  .numero {
-    color: #a88b67;
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 2px;
-  }
+  .reseñas { margin-top: 90px; padding-top: 70px; border-top: 1px solid #e5ddd3; }
+  .encabezado-reseñas { display: flex; justify-content: space-between; align-items: center; gap: 30px; margin-bottom: 35px; }
+  .encabezado-reseñas h2 { color: #29241f; font-size: 2.3rem; margin: 8px 0; }
+  .encabezado-reseñas p { color: #756b62; }
 
-  .seccion-info h2,
-  .encabezado-reseñas h2 {
-    color: #29241f;
-    font-size: 2.3rem;
-    margin: 8px 0 18px;
-  }
+  .promedio { min-width: 160px; text-align: center; background: #f2ece4; border-radius: 18px; padding: 20px; }
+  .promedio strong { display: block; color: #302b26; font-size: 2.3rem; }
+  .promedio div { color: #9a7951; font-size: 1.2rem; letter-spacing: 2px; margin: 4px 0; }
+  .promedio span { color: #776e66; font-size: .8rem; }
 
-  .seccion-info p {
-    color: #665e56;
-    line-height: 1.9;
-    font-size: 1.05rem;
-    margin: 0;
-  }
+  .lista-reseñas { display: grid; gap: 16px; }
+  .resena { background: #fffdf9; border: 1px solid #e3dbd1; border-radius: 16px; padding: 22px; }
+  .resena-superior { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 12px; }
+  .resena-superior strong { color: #302b26; }
+  .estrellas { color: #9a7951; margin-top: 5px; letter-spacing: 2px; }
+  .fecha { color: #999087; font-size: .75rem; }
+  .resena p { color: #655d55; line-height: 1.7; margin: 0; }
 
-  .reseñas {
-    margin-top: 90px;
-    padding-top: 70px;
-    border-top: 1px solid #e5ddd3;
-  }
+  .sin-resenas { text-align: center; padding: 45px 20px; background: #f7f3ed; border-radius: 18px; }
+  .sin-resenas h3 { color: #302b26; margin-bottom: 5px; }
+  .sin-resenas p { color: #777; }
 
-  .encabezado-reseñas {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 35px;
-  }
+  .formulario-reseña { margin-top: 40px; background: #302b26; border-radius: 22px; padding: 35px; color: white; }
+  .formulario-reseña h3 { margin: 0 0 8px; font-size: 1.5rem; }
+  .texto-formulario { color: #cfc7bf; margin-bottom: 25px; }
+  .formulario-reseña label { display: block; color: #e9e2da; font-size: .85rem; font-weight: 700; margin: 18px 0 8px; }
+  .formulario-reseña select, .formulario-reseña textarea { width: 100%; box-sizing: border-box; border: 1px solid #655b52; border-radius: 10px; background: #fffdf9; color: #302b26; padding: 12px; font: inherit; }
+  .formulario-reseña textarea { resize: vertical; }
+  .formulario-reseña button { margin-top: 18px; border: 0; background: #d4b991; color: #302b26; padding: 13px 22px; border-radius: 10px; cursor: pointer; font-weight: 800; }
+  .formulario-reseña button:disabled { opacity: .6; cursor: not-allowed; }
+  .mensaje { color: #d9c39e; font-size: .9rem; margin-top: 10px; }
 
-  .encabezado-reseñas p {
-    color: #756b62;
-  }
-
-  .promedio {
-    min-width: 160px;
-    text-align: center;
-    background: #f2ece4;
-    border-radius: 18px;
-    padding: 20px;
-  }
-
-  .promedio strong {
-    display: block;
-    color: #302b26;
-    font-size: 2.3rem;
-  }
-
-  .promedio div {
-    color: #9a7951;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    margin: 4px 0;
-  }
-
-  .promedio span {
-    color: #776e66;
-    font-size: 0.8rem;
-  }
-
-  .lista-reseñas {
-    display: grid;
-    gap: 16px;
-  }
-
-  .resena {
-    background: #fffdf9;
-    border: 1px solid #e3dbd1;
-    border-radius: 16px;
-    padding: 22px;
-  }
-
-  .resena-superior {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 12px;
-  }
-
-  .resena-superior strong {
-    color: #302b26;
-  }
-
-  .estrellas {
-    color: #9a7951;
-    margin-top: 5px;
-    letter-spacing: 2px;
-  }
-
-  .fecha {
-    color: #999087;
-    font-size: 0.75rem;
-  }
-
-  .resena p {
-    color: #655d55;
-    line-height: 1.7;
-    margin: 0;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
-  .sin-resenas {
-    text-align: center;
-    padding: 45px 20px;
-    background: #f7f3ed;
-    border-radius: 18px;
-  }
-
-  .icono-reseña {
-    font-size: 2rem;
-    color: #a88b67;
-  }
-
-  .sin-resenas h3 {
-    color: #302b26;
-    margin-bottom: 5px;
-  }
-
-  .sin-resenas p {
-    color: #777;
-    margin: 0;
-  }
-
-  .cargando {
-    color: #777;
-  }
-
-  .formulario-reseña {
-    margin-top: 40px;
-    background: #302b26;
-    border-radius: 22px;
-    padding: 35px;
-    color: white;
-  }
-
-  .formulario-reseña h3 {
-    margin: 0 0 8px;
-    font-size: 1.5rem;
-  }
-
-  .texto-formulario {
-    color: #cfc7bf;
-    margin-top: 0;
-    margin-bottom: 25px;
-  }
-
-  .formulario-reseña label {
-    display: block;
-    color: #e9e2da;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin: 18px 0 8px;
-  }
-
-  .formulario-reseña select,
-  .formulario-reseña textarea {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #655b52;
-    border-radius: 10px;
-    background: #fffdf9;
-    color: #302b26;
-    padding: 12px;
-    font-family: inherit;
-    font-size: 0.9rem;
-  }
-
-  .formulario-reseña textarea {
-    resize: vertical;
-  }
-
-  .formulario-reseña button {
-    margin-top: 18px;
-    border: 0;
-    background: #d4b991;
-    color: #302b26;
-    padding: 13px 22px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 800;
-  }
-
-  .formulario-reseña button:hover {
-    background: #ead6b7;
-  }
-
-  .formulario-reseña button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .mensaje {
-    color: #d9c39e;
-    font-size: 0.9rem;
-    margin-top: 10px;
-  }
-
-  .final {
-    text-align: center;
-    margin-top: 65px;
-  }
-
-  .boton-explorar {
-    display: inline-block;
-    background: #302b26;
-    color: white;
-    text-decoration: none;
-    padding: 14px 25px;
-    border-radius: 10px;
-    font-weight: 800;
-  }
-
-  .boton-explorar:hover {
-    background: #574b40;
-  }
+  .final { text-align: center; margin-top: 65px; }
+  .boton-explorar { display: inline-block; background: #302b26; color: white; text-decoration: none; padding: 14px 25px; border-radius: 10px; font-weight: 800; }
 
   @media (max-width: 800px) {
-    .libro-principal {
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
-
-    .portada {
-      max-width: 350px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    .encabezado-reseñas {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .promedio {
-      width: 100%;
-      box-sizing: border-box;
-    }
+    .libro-principal { grid-template-columns: 1fr; gap: 40px; }
+    .portada { max-width: 350px; width: 100%; margin: 0 auto; }
+    .encabezado-reseñas { flex-direction: column; align-items: flex-start; }
+    .promedio { width: 100%; box-sizing: border-box; }
   }
 
-  @media (max-width: 480px) {
-    .detalle {
-      padding: 35px 16px 70px;
-    }
-
-    .portada {
-      height: 420px;
-    }
-
-    .informacion-principal h1 {
-      font-size: 2.7rem;
-    }
-
-    .seccion-info h2,
-    .encabezado-reseñas h2 {
-      font-size: 1.8rem;
-    }
-
-    .formulario-reseña {
-      padding: 22px;
-    }
-
-    .datos div {
-      flex: 1;
-      min-width: 90px;
-    }
+  @media (max-width: 500px) {
+    .detalle { padding: 35px 15px 60px; }
+    .portada { height: 420px; }
+    .formulario-reseña { padding: 22px; }
   }
 </style>
