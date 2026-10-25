@@ -1,4 +1,3 @@
-
 ---
 import Layout from "../layouts/Layout.astro";
 
@@ -8,9 +7,14 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 ---
 
 <Layout titulo="Crear cuenta | BiblioSchool">
+
   <main class="registro">
+
     <section class="presentacion">
-      <p class="etiqueta">BIBLIOSCHOOL / NUEVA CUENTA</p>
+
+      <p class="etiqueta">
+        BIBLIOSCHOOL / NUEVA CUENTA
+      </p>
 
       <h1>
         Forma parte de
@@ -25,6 +29,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
       <div class="nota">
         <span>01</span>
+
         <p>
           Completa tus datos para crear tu espacio personal
           dentro de la biblioteca escolar.
@@ -33,23 +38,43 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
       <div class="nota segunda">
         <span>02</span>
+
         <p>
           ¿Ya tienes una cuenta?
-          <a href={`${base}login/`}>Inicia sesión →</a>
+          <a href={`${base}login/`}>
+            Inicia sesión →
+          </a>
         </p>
       </div>
+
     </section>
 
     <section class="formulario-seccion">
+
       <div class="encabezado-formulario">
-        <p class="numero">01 / REGISTRO</p>
-        <h2>Crear cuenta</h2>
-        <p>Completa la información para comenzar.</p>
+
+        <p class="numero">
+          01 / REGISTRO
+        </p>
+
+        <h2>
+          Crear cuenta
+        </h2>
+
+        <p>
+          Completa la información para comenzar.
+        </p>
+
       </div>
 
       <form id="formulario-registro">
+
         <div class="campo">
-          <label for="nombre">Nombre completo</label>
+
+          <label for="nombre">
+            Nombre completo
+          </label>
+
           <input
             type="text"
             id="nombre"
@@ -57,10 +82,15 @@ const base = import.meta.env.BASE_URL.endsWith("/")
             autocomplete="name"
             required
           />
+
         </div>
 
         <div class="campo">
-          <label for="usuario">Nombre de usuario</label>
+
+          <label for="usuario">
+            Nombre de usuario
+          </label>
+
           <input
             type="text"
             id="usuario"
@@ -68,10 +98,15 @@ const base = import.meta.env.BASE_URL.endsWith("/")
             autocomplete="username"
             required
           />
+
         </div>
 
         <div class="campo">
-          <label for="correo">Correo electrónico</label>
+
+          <label for="correo">
+            Correo electrónico
+          </label>
+
           <input
             type="email"
             id="correo"
@@ -79,10 +114,15 @@ const base = import.meta.env.BASE_URL.endsWith("/")
             autocomplete="email"
             required
           />
+
         </div>
 
         <div class="campo">
-          <label for="contrasena">Contraseña</label>
+
+          <label for="contrasena">
+            Contraseña
+          </label>
+
           <input
             type="password"
             id="contrasena"
@@ -91,10 +131,15 @@ const base = import.meta.env.BASE_URL.endsWith("/")
             autocomplete="new-password"
             required
           />
+
         </div>
 
         <div class="campo">
-          <label for="confirmar">Confirmar contraseña</label>
+
+          <label for="confirmar">
+            Confirmar contraseña
+          </label>
+
           <input
             type="password"
             id="confirmar"
@@ -103,24 +148,44 @@ const base = import.meta.env.BASE_URL.endsWith("/")
             autocomplete="new-password"
             required
           />
+
         </div>
 
-        <p id="mensaje" role="status" aria-live="polite"></p>
+        <p
+          id="mensaje"
+          role="status"
+          aria-live="polite"
+        ></p>
 
         <button type="submit">
           Crear mi cuenta
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true">
+            →
+          </span>
         </button>
+
       </form>
 
       <div class="alternativa">
-        <p>¿Ya tienes una cuenta?</p>
-        <a href={`${base}login/`}>Iniciar sesión →</a>
+
+        <p>
+          ¿Ya tienes una cuenta?
+        </p>
+
+        <a href={`${base}login/`}>
+          Iniciar sesión →
+        </a>
+
       </div>
 
-      <a href={base} class="volver">← Volver al inicio</a>
+      <a href={base} class="volver">
+        ← Volver al inicio
+      </a>
+
     </section>
+
   </main>
+
 </Layout>
 
 <style>
@@ -296,7 +361,10 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     gap: 13px;
     font-size: 12px;
     font-weight: 600;
-    transition: background 0.2s ease, gap 0.2s ease;
+    transition:
+      background 0.2s ease,
+      gap 0.2s ease;
+    cursor: pointer;
   }
 
   form button:hover {
@@ -403,80 +471,171 @@ const base = import.meta.env.BASE_URL.endsWith("/")
     : `${import.meta.env.BASE_URL}/`;
 
   function prepararRegistro() {
-    const formulario = document.querySelector("#formulario-registro");
-    const mensaje = document.querySelector("#mensaje");
+    const formulario =
+      document.querySelector("#formulario-registro");
+
+    const mensaje =
+      document.querySelector("#mensaje");
 
     if (!formulario || !mensaje) {
-      console.error("No se encontró el formulario o el mensaje.");
+      console.error(
+        "No se encontró el formulario o el mensaje."
+      );
+
       return;
     }
 
-    formulario.addEventListener("submit", async (evento) => {
-      evento.preventDefault();
+    formulario.addEventListener(
+      "submit",
+      async (evento) => {
 
-      const nombre = document.querySelector("#nombre");
-      const usuario = document.querySelector("#usuario");
-      const correo = document.querySelector("#correo");
-      const contrasena = document.querySelector("#contrasena");
-      const confirmar = document.querySelector("#confirmar");
-      const boton = formulario.querySelector('button[type="submit"]');
+        evento.preventDefault();
 
-      if (
-        !nombre ||
-        !usuario ||
-        !correo ||
-        !contrasena ||
-        !confirmar ||
-        !boton
-      ) {
-        mensaje.textContent =
-          "Falta un campo del formulario. Revisa el código.";
-        return;
-      }
+        const nombre =
+          document.querySelector("#nombre");
 
-      if (contrasena.value !== confirmar.value) {
-        mensaje.textContent = "Las contraseñas no coinciden.";
-        return;
-      }
+        const usuario =
+          document.querySelector("#usuario");
 
-      mensaje.textContent = "Conectando con Supabase...";
-      boton.disabled = true;
+        const correo =
+          document.querySelector("#correo");
 
-      try {
-        const { data, error } = await supabase.auth.signUp({
-          email: correo.value.trim(),
-          password: contrasena.value,
-          options: {
-            data: {
-              nombre_completo: nombre.value.trim(),
-              nombre_usuario: usuario.value.trim()
-            },
-            emailRedirectTo: `${window.location.origin}${base}login/`
-          }
-        });
+        const contrasena =
+          document.querySelector("#contrasena");
 
-        if (error) {
-          console.error("Supabase respondió:", error);
-          mensaje.textContent = "Error de registro: " + error.message;
+        const confirmar =
+          document.querySelector("#confirmar");
+
+        const boton =
+          formulario.querySelector(
+            'button[type="submit"]'
+          );
+
+        if (
+          !nombre ||
+          !usuario ||
+          !correo ||
+          !contrasena ||
+          !confirmar ||
+          !boton
+        ) {
+          mensaje.textContent =
+            "Falta un campo del formulario. Revisa el código.";
+
           return;
         }
 
-        mensaje.textContent = data.session
-          ? "¡Cuenta creada correctamente!"
-          : "Registro enviado. Revisa tu correo para confirmar la cuenta.";
-      } catch (error) {
-        console.error("Error al conectar:", error);
+        if (
+          contrasena.value !==
+          confirmar.value
+        ) {
+          mensaje.textContent =
+            "Las contraseñas no coinciden.";
+
+          return;
+        }
+
         mensaje.textContent =
-          "No se pudo conectar con Supabase. Revisa tu conexión e inténtalo de nuevo.";
-      } finally {
-        boton.disabled = false;
+          "Creando tu cuenta...";
+
+        boton.disabled = true;
+
+        try {
+
+          const redirectUrl =
+            `${window.location.origin}${base}login/`;
+
+          const { data, error } =
+            await supabase.auth.signUp({
+              email: correo.value.trim(),
+
+              password:
+                contrasena.value,
+
+              options: {
+
+                data: {
+                  nombre_completo:
+                    nombre.value.trim(),
+
+                  nombre_usuario:
+                    usuario.value.trim()
+                },
+
+                emailRedirectTo:
+                  redirectUrl
+              }
+            });
+
+          if (error) {
+
+            console.error(
+              "Supabase respondió:",
+              error
+            );
+
+            mensaje.textContent =
+              "Error de registro: " +
+              error.message;
+
+            return;
+          }
+
+          /*
+           * Si Supabase devuelve una sesión,
+           * significa que la cuenta ya quedó
+           * iniciada.
+           */
+          if (data.session) {
+
+            mensaje.textContent =
+              "¡Cuenta creada correctamente! Entrando a tu cuenta...";
+
+            window.location.href =
+              `${base}cuenta/`;
+
+            return;
+          }
+
+          /*
+           * Si no hay sesión, Supabase está
+           * esperando la confirmación del
+           * correo electrónico.
+           */
+          mensaje.textContent =
+            "Cuenta creada. Revisa tu correo electrónico para confirmar tu cuenta.";
+
+        } catch (error) {
+
+          console.error(
+            "Error al conectar:",
+            error
+          );
+
+          mensaje.textContent =
+            "No se pudo conectar con Supabase. Revisa tu conexión e inténtalo de nuevo.";
+
+        } finally {
+
+          boton.disabled = false;
+
+        }
       }
-    });
+    );
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", prepararRegistro);
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      prepararRegistro
+    );
+
   } else {
+
     prepararRegistro();
+
   }
 </script>

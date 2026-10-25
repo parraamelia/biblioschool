@@ -1,1058 +1,295 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { libros } from "../data/libros.js";
+
+const base = "/biblioschool/";
 ---
 
-<Layout titulo="Mi cuenta | BiblioSchool">
-
+<Layout
+  titulo="Mi cuenta | BiblioSchool"
+  descripcion="Espacio personal de BiblioSchool."
+>
   <main class="cuenta">
-
-    <section class="encabezado">
-
+    <section class="bienvenida">
       <div>
-
-        <p class="etiqueta">
-          BIBLIOSCHOOL / MI CUENTA
+        <p class="etiqueta">BIBLIOSCHOOL</p>
+        <h1>Mi cuenta</h1>
+        <p id="saludo">
+          Bienvenido a tu espacio personal.
         </p>
-
-        <h1>
-          Hola,
-          <span id="nombre-usuario">lector.</span>
-        </h1>
-
-        <p class="descripcion">
-          Este es tu espacio personal dentro de BiblioSchool.
-          Desde aquí puedes consultar nuestra colección y
-          comenzar a leer.
-        </p>
-
+        <p id="correo-usuario" class="correo"></p>
       </div>
 
-      <div class="numero">
-
-        <span>01</span>
-
-        <small>
-          ESPACIO<br />
-          PERSONAL
-        </small>
-
-      </div>
-
+      <button id="cerrar-sesion" class="boton-salir">
+        Cerrar sesión
+      </button>
     </section>
 
-
-    <section class="datos-usuario">
-
-      <div>
-        <p>USUARIO</p>
-        <strong id="usuario-correo">
-          Cargando...
-        </strong>
-      </div>
-
-      <div>
-        <p>ESTADO</p>
-        <strong>Cuenta activa</strong>
-      </div>
-
-    </section>
-
-
-    <section class="contenido">
-
-      <div class="barra">
-
+    <section class="biblioteca">
+      <div class="titulo-seccion">
         <div>
-
-          <p class="numero-seccion">
-            01 / COLECCIÓN
-          </p>
-
-          <h2>
-            Libros disponibles
-          </h2>
-
+          <p class="etiqueta">TU BIBLIOTECA</p>
+          <h2>Libros disponibles</h2>
         </div>
 
-        <p class="cantidad">
-          06 títulos
-        </p>
-
+        <span class="cantidad">{libros.length} títulos</span>
       </div>
 
-
-      <section class="libros">
-
-        <article class="libro">
-
-          <div class="portada">
-            <span>01</span>
-            <strong>
-              Cien años<br />
-              de soledad
-            </strong>
-            <small>
-              Gabriel García Márquez
-            </small>
-          </div>
-
-          <div class="info">
-
-            <p class="numero-libro">
-              01 / LITERATURA
-            </p>
-
-            <h3>
-              Cien años de soledad
-            </h3>
-
-            <p>
-              Una de las obras fundamentales de la literatura
-              latinoamericana.
-            </p>
-
-            <a href="/libro/1">
-              Ver libro →
+      <div class="libros-grid">
+        {libros.map((libro) => (
+          <article class="libro-card">
+            <a href={`${base}libro/${libro.id}/`} class="portada-link">
+              <div class="portada">
+                <img
+                  src={libro.portada}
+                  alt={`Portada de ${libro.titulo}`}
+                  loading="lazy"
+                />
+              </div>
             </a>
 
-          </div>
+            <div class="informacion">
+              <span class="categoria">{libro.categoria}</span>
 
-        </article>
+              <h3>{libro.titulo}</h3>
 
+              <p>{libro.autor}</p>
 
-        <article class="libro">
-
-          <div class="portada">
-            <span>02</span>
-            <strong>
-              Don Quijote<br />
-              de la Mancha
-            </strong>
-            <small>
-              Miguel de Cervantes
-            </small>
-          </div>
-
-          <div class="info">
-
-            <p class="numero-libro">
-              02 / CLÁSICOS
-            </p>
-
-            <h3>
-              Don Quijote de la Mancha
-            </h3>
-
-            <p>
-              Una de las obras fundamentales de la literatura
-              española.
-            </p>
-
-            <a href="/libro/2">
-              Ver libro →
-            </a>
-
-          </div>
-
-        </article>
-
-
-        <article class="libro">
-
-          <div class="portada">
-            <span>03</span>
-            <strong>
-              La<br />
-              Odisea
-            </strong>
-            <small>
-              Homero
-            </small>
-          </div>
-
-          <div class="info">
-
-            <p class="numero-libro">
-              03 / LITERATURA CLÁSICA
-            </p>
-
-            <h3>
-              La Odisea
-            </h3>
-
-            <p>
-              El viaje de Odiseo y su largo regreso a Ítaca.
-            </p>
-
-            <a href="/libro/3">
-              Ver libro →
-            </a>
-
-          </div>
-
-        </article>
-
-
-        <article class="libro">
-
-          <div class="portada">
-            <span>04</span>
-            <strong>
-              El<br />
-              principito
-            </strong>
-            <small>
-              Antoine de Saint-Exupéry
-            </small>
-          </div>
-
-          <div class="info">
-
-            <p class="numero-libro">
-              04 / LITERATURA JUVENIL
-            </p>
-
-            <h3>
-              El principito
-            </h3>
-
-            <p>
-              Una historia para reflexionar sobre la amistad
-              y las relaciones humanas.
-            </p>
-
-            <a href="/libro/4">
-              Ver libro →
-            </a>
-
-          </div>
-
-        </article>
-
-
-        <article class="libro">
-
-          <div class="portada">
-            <span>05</span>
-            <strong>
-              Don Juan<br />
-              Tenorio
-            </strong>
-            <small>
-              José Zorrilla
-            </small>
-          </div>
-
-          <div class="info">
-
-            <p class="numero-libro">
-              05 / TEATRO
-            </p>
-
-            <h3>
-              Don Juan Tenorio
-            </h3>
-
-            <p>
-              Una obra teatral del Romanticismo español.
-            </p>
-
-            <a href="/libro/5">
-              Ver libro →
-            </a>
-
-          </div>
-
-        </article>
-
-
-        <article class="libro">
-
-          <div class="portada">
-            <span>06</span>
-            <strong>
-              La casa<br />
-              de los espíritus
-            </strong>
-            <small>
-              Isabel Allende
-            </small>
-          </div>
-
-          <div class="info">
-
-            <p class="numero-libro">
-              06 / LITERATURA
-            </p>
-
-            <h3>
-              La casa de los espíritus
-            </h3>
-
-            <p>
-              Una historia familiar relacionada con importantes
-              cambios sociales.
-            </p>
-
-            <a href="/libro/6">
-              Ver libro →
-            </a>
-
-          </div>
-
-        </article>
-
-      </section>
-
-
-      <section class="cerrar">
-
-        <div>
-
-          <p class="numero-seccion">
-            CUENTA
-          </p>
-
-          <h2>
-            ¿Quieres salir de tu cuenta?
-          </h2>
-
-        </div>
-
-        <button id="cerrar-sesion">
-          Cerrar sesión →
-        </button>
-
-      </section>
-
+              <a
+                href={`${base}libro/${libro.id}/`}
+                class="boton-libro"
+              >
+                Ver libro
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
-
   </main>
-
 </Layout>
 
-
 <script>
-
   import { supabase } from "../lib/supabase.js";
 
-  const nombreUsuario =
-    document.querySelector("#nombre-usuario");
+  const base = "/biblioschool/";
 
-  const correoUsuario =
-    document.querySelector("#usuario-correo");
+  const saludo = document.querySelector("#saludo");
+  const correoUsuario = document.querySelector("#correo-usuario");
+  const cerrarSesion = document.querySelector("#cerrar-sesion");
 
-  const botonCerrar =
-    document.querySelector("#cerrar-sesion");
+  async function cargarCuenta() {
+    const { data, error } = await supabase.auth.getSession();
 
-
-  async function comprobarSesion() {
-
-    const {
-      data: { session }
-    } = await supabase.auth.getSession();
-
-
-    if (!session) {
-
-      window.location.href = "/login";
-
+    if (error || !data.session) {
+      window.location.href = `${base}login/`;
       return;
-
     }
 
+    const usuario = data.session.user;
 
-    const usuario = session.user;
+    const nombreUsuario =
+      usuario.user_metadata?.nombre_usuario ||
+      usuario.user_metadata?.nombre_completo ||
+      usuario.email?.split("@")[0] ||
+      "Usuario";
 
-
-    const nombre =
-      usuario.user_metadata?.nombre_completo;
-
-
-    if (nombre) {
-
-      const primerNombre =
-        nombre.trim().split(" ")[0];
-
-      if (nombreUsuario) {
-        nombreUsuario.textContent =
-          `${primerNombre}.`;
-      }
-
-    }
-
-
-    if (correoUsuario) {
-
-      correoUsuario.textContent =
-        usuario.email || "Correo no disponible";
-
-    }
-
+    saludo.textContent = `Bienvenido, ${nombreUsuario}.`;
+    correoUsuario.textContent = usuario.email || "";
   }
 
+  cerrarSesion?.addEventListener("click", async () => {
+    cerrarSesion.disabled = true;
+    cerrarSesion.textContent = "Cerrando sesión...";
 
-  comprobarSesion();
+    await supabase.auth.signOut();
 
+    window.location.href = `${base}login/`;
+  });
 
-  botonCerrar?.addEventListener(
-    "click",
-    async () => {
-
-      botonCerrar.textContent =
-        "Cerrando sesión...";
-
-
-      const { error } =
-        await supabase.auth.signOut();
-
-
-      if (error) {
-
-        console.error(
-          "Error al cerrar sesión:",
-          error
-        );
-
-        botonCerrar.textContent =
-          "No se pudo cerrar sesión";
-
-        return;
-
-      }
-
-
-      window.location.href = "/login";
-
-    }
-  );
-
+  cargarCuenta();
 </script>
 
-
 <style>
-
   .cuenta {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 70px 40px 100px;
+    padding: 60px 24px 90px;
   }
 
-
-  .encabezado {
-    display: grid;
-    grid-template-columns: 1fr 180px;
-    gap: 60px;
-
-    padding-bottom: 70px;
-
-    border-bottom: 1px solid #dcd8cd;
+  .bienvenida {
+    background: #302b26;
+    color: white;
+    border-radius: 26px;
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 55px;
   }
-
 
   .etiqueta {
-    margin-bottom: 20px;
+    color: #c6a77a;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin: 0 0 10px;
+  }
 
-    color: #687468;
+  .bienvenida h1 {
+    margin: 0;
+    font-size: clamp(2.3rem, 5vw, 4rem);
+  }
 
-    font-size: 11px;
+  .bienvenida p {
+    margin-top: 12px;
+  }
+
+  .correo {
+    color: #cfc6bd;
+    font-size: 0.9rem;
+  }
+
+  .boton-salir {
+    border: 1px solid #cfc6bd;
+    background: transparent;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
     font-weight: 700;
-
-    letter-spacing: 2px;
   }
 
-
-  .encabezado h1 {
-    margin-bottom: 25px;
-
-    color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: clamp(48px, 7vw, 82px);
-    font-weight: 400;
-
-    line-height: 0.95;
-
-    letter-spacing: -2px;
+  .boton-salir:hover {
+    background: white;
+    color: #302b26;
   }
 
-
-  .encabezado h1 span {
-    display: block;
-
-    font-style: italic;
-  }
-
-
-  .descripcion {
-    max-width: 620px;
-
-    color: #65665f;
-
-    font-size: 16px;
-
-    line-height: 1.8;
-  }
-
-
-  .numero {
-    align-self: end;
-
+  .titulo-seccion {
     display: flex;
-    flex-direction: column;
-
-    gap: 8px;
-
-    padding-top: 20px;
-
-    border-top: 1px solid #293e33;
-  }
-
-
-  .numero span {
-    color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 42px;
-  }
-
-
-  .numero small {
-    color: #687468;
-
-    font-size: 9px;
-    font-weight: 700;
-
-    line-height: 1.5;
-
-    letter-spacing: 1.5px;
-  }
-
-
-  .datos-usuario {
-
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    border-bottom: 1px solid #dcd8cd;
-  }
-
-
-  .datos-usuario > div {
-
-    padding: 25px 0;
-
-  }
-
-
-  .datos-usuario > div + div {
-
-    padding-left: 40px;
-
-    border-left: 1px solid #dcd8cd;
-
-  }
-
-
-  .datos-usuario p {
-
-    margin-bottom: 7px;
-
-    color: #8b978b;
-
-    font-size: 9px;
-    font-weight: 700;
-
-    letter-spacing: 1.5px;
-
-  }
-
-
-  .datos-usuario strong {
-
-    color: #293e33;
-
-    font-size: 14px;
-
-    font-weight: 500;
-
-  }
-
-
-  .contenido {
-
-    padding-top: 70px;
-  }
-
-
-  .barra {
-
-    display: flex;
-
-    align-items: end;
-
     justify-content: space-between;
-
-    gap: 30px;
-
-    margin-bottom: 45px;
+    align-items: end;
+    gap: 20px;
+    margin-bottom: 28px;
   }
 
-
-  .numero-seccion {
-
-    margin-bottom: 10px;
-
-    color: #8b978b;
-
-    font-size: 10px;
-    font-weight: 700;
-
-    letter-spacing: 1.7px;
+  .titulo-seccion h2 {
+    color: #29241f;
+    margin: 0;
+    font-size: 2rem;
   }
-
-
-  .barra h2 {
-
-    color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 38px;
-
-    font-weight: 400;
-  }
-
 
   .cantidad {
-
-    color: #777870;
-
-    font-size: 12px;
+    background: #eee7df;
+    color: #665d55;
+    padding: 9px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
   }
 
-
-  .libros {
-
+  .libros-grid {
     display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    border-top: 1px solid #dcd8cd;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
   }
 
-
-  .libro {
-
-    display: grid;
-
-    grid-template-columns: 150px 1fr;
-
-    gap: 30px;
-
-    padding: 35px 0;
-
-    border-bottom: 1px solid #dcd8cd;
+  .libro-card {
+    background: #fffdf9;
+    border: 1px solid #e5ddd3;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(50, 40, 30, 0.06);
+    transition: 0.25s;
   }
 
-
-  .libro:nth-child(odd) {
-
-    padding-right: 35px;
-
-    border-right: 1px solid #dcd8cd;
-
+  .libro-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 35px rgba(50, 40, 30, 0.12);
   }
 
-
-  .libro:nth-child(even) {
-
-    padding-left: 35px;
-
+  .portada-link {
+    display: block;
   }
-
 
   .portada {
+    height: 300px;
+    background: #eee7df;
+    overflow: hidden;
+  }
 
-    min-height: 210px;
+  .portada img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
+  .informacion {
     padding: 18px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: space-between;
-
-    background: #405b49;
-
-    color: #f6f3ec;
-
   }
 
-
-  .libro:nth-child(2) .portada {
-    background: #5b6659;
+  .categoria {
+    color: #9a7951;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
-
-  .libro:nth-child(3) .portada {
-    background: #6b6657;
-  }
-
-
-  .libro:nth-child(4) .portada {
-    background: #65746a;
-  }
-
-
-  .libro:nth-child(5) .portada {
-    background: #746b5d;
-  }
-
-
-  .libro:nth-child(6) .portada {
-    background: #4f6356;
-  }
-
-
-  .portada span {
-
-    font-size: 9px;
-
-    letter-spacing: 1.5px;
-
-  }
-
-
-  .portada strong {
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 20px;
-
-    font-weight: 400;
-
-    line-height: 1.1;
-
-  }
-
-
-  .portada small {
-
-    font-size: 9px;
-
+  .informacion h3 {
+    color: #29241f;
+    font-size: 1.05rem;
     line-height: 1.3;
-
-    opacity: 0.8;
-
+    margin: 8px 0 5px;
   }
 
-
-  .info {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    padding-top: 5px;
+  .informacion p {
+    color: #71675e;
+    font-size: 0.88rem;
+    margin: 0 0 16px;
   }
 
-
-  .numero-libro {
-
-    margin-bottom: 14px;
-
-    color: #8b978b;
-
-    font-size: 9px;
-
+  .boton-libro {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    background: #302b26;
+    color: white;
+    padding: 10px;
+    border-radius: 9px;
+    font-size: 0.82rem;
     font-weight: 700;
-
-    letter-spacing: 1.3px;
-
   }
 
-
-  .info h3 {
-
-    margin-bottom: 12px;
-
-    color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 24px;
-
-    font-weight: 400;
-
-    line-height: 1.15;
-
+  .boton-libro:hover {
+    background: #574b40;
   }
 
-
-  .info p:not(.numero-libro) {
-
-    margin-bottom: 25px;
-
-    color: #777870;
-
-    font-size: 13px;
-
-    line-height: 1.6;
-
+  @media (max-width: 1000px) {
+    .libros-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
+  @media (max-width: 700px) {
+    .bienvenida {
+      flex-direction: column;
+      align-items: flex-start;
+    }
 
-  .info a {
-
-    margin-top: auto;
-
-    color: #293e33;
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-  }
-
-
-  .info a:hover {
-
-    text-decoration: underline;
-
-  }
-
-
-  .cerrar {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 30px;
-
-    margin-top: 80px;
-
-    padding: 35px 0;
-
-    border-top: 1px solid #293e33;
-
-    border-bottom: 1px solid #dcd8cd;
-
-  }
-
-
-  .cerrar h2 {
-
-    color: #293e33;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size: 25px;
-
-    font-weight: 400;
-
-  }
-
-
-  .cerrar button {
-
-    min-height: 42px;
-
-    padding: 0 20px;
-
-    border: 1px solid #293e33;
-
-    background: transparent;
-
-    color: #293e33;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-
-  }
-
-
-  .cerrar button:hover {
-
-    background: #293e33;
-
-    color: #ffffff;
-
-  }
-
-
-  @media (max-width: 950px) {
-
-    .libro {
-
-      grid-template-columns: 125px 1fr;
-
-      gap: 22px;
-
+    .libros-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .portada {
-
-      min-height: 190px;
-
+      height: 260px;
     }
-
   }
 
-
-  @media (max-width: 750px) {
-
-    .cuenta {
-
-      padding: 50px 25px 80px;
-
-    }
-
-    .encabezado {
-
+  @media (max-width: 480px) {
+    .libros-grid {
       grid-template-columns: 1fr;
-
-      gap: 40px;
-
     }
-
-    .numero {
-
-      max-width: 180px;
-
-    }
-
-    .libros {
-
-      grid-template-columns: 1fr;
-
-    }
-
-    .libro:nth-child(odd) {
-
-      padding-right: 0;
-
-      border-right: 0;
-
-    }
-
-    .libro:nth-child(even) {
-
-      padding-left: 0;
-
-    }
-
   }
-
-
-  @media (max-width: 500px) {
-
-    .cuenta {
-
-      padding: 40px 18px 70px;
-
-    }
-
-    .encabezado h1 {
-
-      font-size: 50px;
-
-    }
-
-    .datos-usuario {
-
-      grid-template-columns: 1fr;
-
-    }
-
-    .datos-usuario > div + div {
-
-      padding-left: 0;
-
-      border-left: 0;
-
-      border-top: 1px solid #dcd8cd;
-
-    }
-
-    .barra {
-
-      align-items: flex-start;
-
-      flex-direction: column;
-
-      gap: 8px;
-
-    }
-
-    .libro {
-
-      grid-template-columns: 105px 1fr;
-
-      gap: 18px;
-
-    }
-
-    .portada {
-
-      min-height: 165px;
-
-      padding: 13px;
-
-    }
-
-    .portada strong {
-
-      font-size: 16px;
-
-    }
-
-    .info h3 {
-
-      font-size: 20px;
-
-    }
-
-    .cerrar {
-
-      align-items: flex-start;
-
-      flex-direction: column;
-
-    }
-
-  }
-
 </style>

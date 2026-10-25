@@ -1,363 +1,485 @@
-
 ---
 import Layout from "../layouts/Layout.astro";
+import { supabase } from "../lib/supabase.js";
 
 const base = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
+
+const loginUrl = `${base}login/`;
+const cuentaUrl = `${base}cuenta/`;
+const catalogoUrl = `${base}catalogo/`;
+const resenasUrl = `${base}resenas/`;
 ---
 
-<Layout titulo="BiblioSchool | Biblioteca Escolar">
-  <main class="inicio">
-    <section class="portada">
-      <div class="portada-texto">
-        <p class="sobretitulo">LECTURA · CONOCIMIENTO · CULTURA</p>
+<Layout
+  titulo="BiblioSchool | Biblioteca Escolar"
+  descripcion="Biblioteca virtual escolar para descubrir, consultar y compartir libros."
+>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-text">
+
+        <span class="hero-label">
+          BIBLIOTECA ESCOLAR DIGITAL
+        </span>
 
         <h1>
-          Un lugar para encontrar
-          <span>tu próximo libro.</span>
+          Un lugar para<br />
+          <em>leer, descubrir</em><br />
+          y aprender.
         </h1>
 
-        <p class="descripcion">
-          Explora nuestra colección de libros y materiales educativos.
-          Consulta títulos, descubre autores y encuentra nuevas lecturas
-          en la biblioteca escolar.
+        <p>
+          Explora libros de diferentes épocas, géneros y autores.
+          Encuentra nuevas historias y descubre lecturas que pueden
+          acompañarte dentro y fuera del aula.
         </p>
 
-        <div class="acciones">
-          <a href={`${base}catalogo/`} class="boton principal">
-            Explorar catálogo <span aria-hidden="true">→</span>
+        <div class="hero-buttons">
+
+          <a href={catalogoUrl} class="btn-principal">
+            Explorar catálogo →
           </a>
 
-          <a href={`${base}login/`} class="boton secundario">
+          <a href={loginUrl} class="btn-secundario" id="inicio-login">
             Iniciar sesión
           </a>
-        </div>
-      </div>
 
-      <div class="portada-imagen">
-        <img
-          src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1100&q=85"
-          alt="Estanterías de una biblioteca con libros"
-        />
-        <div class="imagen-pie">
-          <span>01 — NUESTRA BIBLIOTECA</span>
-          <span>Un espacio para aprender</span>
+          <a
+            href={cuentaUrl}
+            class="btn-secundario"
+            id="inicio-cuenta"
+            style="display:none;"
+          >
+            Mi cuenta
+          </a>
+
         </div>
+
       </div>
     </section>
 
-    <section class="introduccion">
-      <div class="introduccion-titulo">
-        <p class="sobretitulo">BIBLIOSCHOOL</p>
-        <h2>El conocimiento, al alcance de todos.</h2>
+
+    <section class="explorar">
+
+      <div class="section-heading">
+
+        <span>01</span>
+
+        <div>
+          <h2>Explora</h2>
+
+          <p>
+            Encuentra libros de diferentes géneros, autores y épocas.
+          </p>
+
+          <a href={catalogoUrl}>
+            Ver catálogo →
+          </a>
+        </div>
+
       </div>
 
-      <p class="introduccion-texto">
-        Una biblioteca digital pensada para facilitar el acceso a los
-        libros y acompañar el aprendizaje de nuestra comunidad educativa.
-      </p>
+
+      <div class="section-heading">
+
+        <span>02</span>
+
+        <div>
+          <h2>Descubre</h2>
+
+          <p>
+            Mira los libros mejor valorados por nuestros lectores y
+            descubre qué historias están recomendando.
+          </p>
+
+          <a href={resenasUrl}>
+            Ver mejores reseñas →
+          </a>
+        </div>
+
+      </div>
+
+
+      <div class="section-heading">
+
+        <span>03</span>
+
+        <div>
+
+          <h2 id="servicio-cuenta-titulo">
+            Tu cuenta
+          </h2>
+
+          <p id="servicio-cuenta-texto">
+            Guarda tu espacio personal y disfruta de una experiencia
+            más organizada dentro de BiblioSchool.
+          </p>
+
+          <a
+            href={loginUrl}
+            id="servicio-cuenta-link"
+          >
+            Iniciar sesión →
+          </a>
+
+        </div>
+
+      </div>
+
     </section>
 
-    <section class="servicios">
-      <a href={`${base}catalogo/`} class="servicio">
-        <span class="numero">01</span>
-        <div>
-          <h3>Catálogo de libros</h3>
-          <p>Consulta las obras y los materiales disponibles.</p>
-        </div>
-        <span class="flecha" aria-hidden="true">↗</span>
-      </a>
 
-      <a href={`${base}catalogo/`} class="servicio">
-        <span class="numero">02</span>
-        <div>
-          <h3>Búsqueda por categorías</h3>
-          <p>Encuentra lecturas según tus intereses y necesidades.</p>
-        </div>
-        <span class="flecha" aria-hidden="true">↗</span>
-      </a>
+    <section class="descubre">
 
-      <a href={`${base}login/`} class="servicio">
-        <span class="numero">03</span>
-        <div>
-          <h3>Tu cuenta</h3>
-          <p>Accede a tu espacio personal de la biblioteca.</p>
-        </div>
-        <span class="flecha" aria-hidden="true">↗</span>
-      </a>
+      <div class="descubre-inner">
+
+        <span>03</span>
+
+        <h2>
+          ¿No sabes qué<br />
+          <em>leer después?</em>
+        </h2>
+
+        <p>
+          Las reseñas de otros lectores pueden ayudarte a encontrar
+          una historia que realmente te interese.
+        </p>
+
+        <a href={resenasUrl}>
+          Descubrir libros →
+        </a>
+
+      </div>
+
     </section>
 
-    <footer class="pie">
-      <a href={base} class="pie-marca">BiblioSchool</a>
-      <p>Una biblioteca para nuestra comunidad educativa.</p>
-      <a href={`${base}catalogo/`}>Consultar catálogo →</a>
-    </footer>
   </main>
+
 </Layout>
 
+
+<script>
+  import { supabase } from "../lib/supabase.js";
+
+  const base = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+
+  const loginUrl = `${base}login/`;
+  const cuentaUrl = `${base}cuenta/`;
+
+  const loginButton =
+    document.getElementById("inicio-login");
+
+  const cuentaButton =
+    document.getElementById("inicio-cuenta");
+
+  const cuentaTitulo =
+    document.getElementById("servicio-cuenta-titulo");
+
+  const cuentaTexto =
+    document.getElementById("servicio-cuenta-texto");
+
+  const cuentaLink =
+    document.getElementById("servicio-cuenta-link");
+
+
+  const comprobarSesion = async () => {
+
+    try {
+
+      const { data } =
+        await supabase.auth.getSession();
+
+      const session = data?.session;
+
+
+      if (session) {
+
+        if (loginButton) {
+          loginButton.style.display = "none";
+        }
+
+        if (cuentaButton) {
+          cuentaButton.style.display = "inline-block";
+        }
+
+        if (cuentaTitulo) {
+          cuentaTitulo.textContent = "Tu cuenta";
+        }
+
+        if (cuentaTexto) {
+          cuentaTexto.textContent =
+            "Ya tienes una cuenta. Entra a tu espacio personal para consultar tus libros.";
+        }
+
+        if (cuentaLink) {
+          cuentaLink.href = cuentaUrl;
+          cuentaLink.textContent = "Ir a mi cuenta →";
+        }
+
+      } else {
+
+        if (loginButton) {
+          loginButton.style.display = "inline-block";
+        }
+
+        if (cuentaButton) {
+          cuentaButton.style.display = "none";
+        }
+
+        if (cuentaTitulo) {
+          cuentaTitulo.textContent = "Tu cuenta";
+        }
+
+        if (cuentaTexto) {
+          cuentaTexto.textContent =
+            "Crea tu cuenta o inicia sesión para disfrutar de tu espacio personal.";
+        }
+
+        if (cuentaLink) {
+          cuentaLink.href = loginUrl;
+          cuentaLink.textContent = "Iniciar sesión →";
+        }
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "No se pudo comprobar la sesión:",
+        error
+      );
+
+    }
+
+  };
+
+
+  comprobarSesion();
+
+
+  supabase.auth.onAuthStateChange(
+    (_event, session) => {
+
+      if (session) {
+
+        if (loginButton) {
+          loginButton.style.display = "none";
+        }
+
+        if (cuentaButton) {
+          cuentaButton.style.display = "inline-block";
+        }
+
+        if (cuentaLink) {
+          cuentaLink.href = cuentaUrl;
+          cuentaLink.textContent = "Ir a mi cuenta →";
+        }
+
+      } else {
+
+        if (loginButton) {
+          loginButton.style.display = "inline-block";
+        }
+
+        if (cuentaButton) {
+          cuentaButton.style.display = "none";
+        }
+
+        if (cuentaLink) {
+          cuentaLink.href = loginUrl;
+          cuentaLink.textContent = "Iniciar sesión →";
+        }
+
+      }
+
+    }
+  );
+</script>
+
+
 <style>
-  .inicio {
-    --verde: #293e33;
-    --verde-suave: #657568;
-    --fondo: #f6f3ec;
-    --texto: #30342f;
-    --linea: #dcd8cd;
-    background: var(--fondo);
-    color: var(--texto);
-  }
 
-  .portada {
-    display: grid;
-    grid-template-columns: 1fr 0.92fr;
-    gap: 7%;
+  .hero {
+    min-height: 78vh;
+    display: flex;
     align-items: center;
-    max-width: 1400px;
-    min-height: 610px;
-    margin: 0 auto;
-    padding: 75px 8% 85px;
+    padding: 80px 9%;
+    background: #f7f3ea;
   }
 
-  .portada-texto {
-    max-width: 570px;
+  .hero-text {
+    max-width: 850px;
   }
 
-  .sobretitulo {
-    color: var(--verde-suave);
-    font-size: 11px;
-    font-weight: 700;
+  .hero-label {
+    color: #8b7750;
+    font-size: .78rem;
     letter-spacing: 2px;
-    line-height: 1.7;
   }
 
-  .portada h1 {
+  .hero h1 {
     margin: 25px 0;
-    color: var(--verde);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(42px, 5vw, 68px);
-    font-weight: 400;
-    letter-spacing: -2px;
-    line-height: 1.08;
+    color: #183c32;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: .95;
+    font-weight: 500;
   }
 
-  .portada h1 span {
-    display: block;
-    font-style: italic;
+  .hero h1 em {
+    color: #a48751;
+    font-family: Georgia, serif;
     font-weight: 400;
   }
 
-  .descripcion {
-    max-width: 450px;
-    color: #65665f;
-    font-size: 16px;
-    line-height: 1.9;
+  .hero p {
+    max-width: 620px;
+    color: #666;
+    line-height: 1.8;
+    font-size: 1.05rem;
   }
 
-  .acciones {
+  .hero-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
     margin-top: 30px;
   }
 
-  .boton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    min-height: 48px;
-    padding: 0 20px;
-    font-size: 13px;
-    transition: background 0.2s, color 0.2s;
+  .btn-principal,
+  .btn-secundario {
+    padding: 14px 23px;
+    text-decoration: none;
+    transition: .25s;
   }
 
-  .principal {
-    background: var(--verde);
-    color: #fff;
+  .btn-principal {
+    background: #183c32;
+    color: white;
   }
 
-  .principal:hover {
-    background: #405b49;
+  .btn-principal:hover {
+    background: #285849;
   }
 
-  .secundario {
-    border: 1px solid #c9c7bc;
-    color: var(--verde);
+  .btn-secundario {
+    border: 1px solid #183c32;
+    color: #183c32;
   }
 
-  .secundario:hover {
-    background: #eae6dc;
+  .btn-secundario:hover {
+    background: #183c32;
+    color: white;
   }
 
-  .portada-imagen {
-    min-width: 0;
+  .explorar {
+    max-width: 1100px;
+    margin: auto;
+    padding: 100px 25px;
   }
 
-  .portada-imagen img {
-    display: block;
-    width: 100%;
-    height: 390px;
-    object-fit: cover;
-  }
-
-  .imagen-pie {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding-top: 14px;
-    color: #73756b;
-    font-size: 10px;
-    letter-spacing: 0.6px;
-  }
-
-  .introduccion {
+  .section-heading {
     display: grid;
-    grid-template-columns: 1fr 0.7fr;
-    align-items: end;
-    gap: 60px;
-    padding: 65px 10%;
-    border-top: 1px solid var(--linea);
-    border-bottom: 1px solid var(--linea);
-    background: #eeebe2;
-  }
-
-  .introduccion h2 {
-    max-width: 480px;
-    margin-top: 15px;
-    color: var(--verde);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(28px, 3vw, 40px);
-    font-weight: 400;
-    line-height: 1.25;
-  }
-
-  .introduccion-texto {
-    max-width: 430px;
-    color: #65665f;
-    font-size: 14px;
-    line-height: 1.9;
-  }
-
-  .servicios {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 35px 8% 65px;
-  }
-
-  .servicio {
-    display: grid;
-    grid-template-columns: 55px 1fr 30px;
-    align-items: center;
+    grid-template-columns: 60px 1fr;
     gap: 20px;
-    padding: 26px 0;
-    border-bottom: 1px solid var(--linea);
-    transition: padding 0.2s;
+    padding: 40px 0;
+    border-top: 1px solid #ddd5c8;
   }
 
-  .servicio:hover {
-    padding-right: 8px;
-    padding-left: 8px;
+  .section-heading > span {
+    color: #a48751;
+    font-size: .9rem;
   }
 
-  .numero {
-    color: var(--verde-suave);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 17px;
+  .section-heading h2 {
+    margin: 0 0 10px;
+    color: #183c32;
+    font-size: 2.8rem;
+    font-weight: 500;
   }
 
-  .servicio h3 {
-    margin-bottom: 7px;
-    color: var(--verde);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 22px;
-    font-weight: 400;
-  }
-
-  .servicio p {
-    color: #72736b;
-    font-size: 13px;
+  .section-heading p {
+    max-width: 650px;
+    margin: 0 0 18px;
+    color: #666;
     line-height: 1.7;
   }
 
-  .flecha {
-    color: var(--verde);
-    font-size: 21px;
+  .section-heading a {
+    color: #183c32;
+    font-weight: bold;
+    text-decoration: none;
   }
 
-  .pie {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 18px;
-    padding: 28px 8%;
-    border-top: 1px solid var(--linea);
-    color: #66685f;
-    font-size: 12px;
+  .section-heading a:hover {
+    text-decoration: underline;
   }
 
-  .pie-marca {
-    color: var(--verde);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 21px;
+  .descubre {
+    padding: 100px 25px;
+    background: #183c32;
+    color: white;
   }
 
-  .pie > a:last-child {
-    color: var(--verde);
+  .descubre-inner {
+    max-width: 1100px;
+    margin: auto;
   }
 
-  @media (max-width: 850px) {
-    .portada {
-      grid-template-columns: 1fr;
-      gap: 40px;
-      padding: 60px 7%;
-    }
-
-    .portada-imagen img {
-      height: 330px;
-    }
-
-    .introduccion {
-      grid-template-columns: 1fr;
-      gap: 20px;
-      padding: 45px 7%;
-    }
-
-    .servicios {
-      padding: 25px 7% 45px;
-    }
-
-    .pie {
-      padding: 25px 7%;
-    }
+  .descubre-inner > span {
+    color: #d7b878;
   }
 
-  @media (max-width: 480px) {
-    .portada h1 {
-      font-size: 43px;
-      letter-spacing: -1.3px;
-    }
-
-    .portada-imagen img {
-      height: 250px;
-    }
-
-    .imagen-pie {
-      flex-direction: column;
-    }
-
-    .servicio {
-      grid-template-columns: 30px 1fr 20px;
-      gap: 12px;
-    }
-
-    .servicio h3 {
-      font-size: 19px;
-    }
-
-    .pie {
-      align-items: flex-start;
-      flex-direction: column;
-    }
+  .descubre h2 {
+    margin: 25px 0;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1;
+    font-weight: 400;
   }
+
+  .descubre h2 em {
+    color: #d7b878;
+    font-family: Georgia, serif;
+  }
+
+  .descubre p {
+    max-width: 550px;
+    color: rgba(255,255,255,.75);
+    line-height: 1.8;
+  }
+
+  .descubre a {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 14px 23px;
+    background: #d7b878;
+    color: #183c32;
+    text-decoration: none;
+  }
+
+  @media (max-width: 600px) {
+
+    .hero {
+      padding: 70px 25px;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+    }
+
+    .section-heading {
+      grid-template-columns: 35px 1fr;
+    }
+
+    .section-heading h2 {
+      font-size: 2.2rem;
+    }
+
+  }
+
 </style>

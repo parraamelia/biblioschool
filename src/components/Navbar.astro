@@ -1,147 +1,216 @@
-
 ---
-const base = import.meta.env.BASE_URL.endsWith("/")
-  ? import.meta.env.BASE_URL
-  : `${import.meta.env.BASE_URL}/`;
-
-const inicio = base;
-const catalogo = `${base}catalogo/`;
-const login = `${base}login/`;
-const registro = `${base}registro/`;
+const base = "/biblioschool/";
 ---
 
-<header class="navbar">
-  <div class="contenedor">
-    <a href={inicio} class="logo">
-      Biblio<span>School</span>
+<nav class="navbar">
+  <div class="nav-contenido">
+
+    <a href={`${base}`} class="logo">
+      <span class="logo-icon">B</span>
+      <span>BiblioSchool</span>
     </a>
 
-    <nav>
-      <a href={inicio} class="enlace">Inicio</a>
-      <a href={catalogo} class="enlace">Catálogo</a>
-      <a href={login} class="enlace">Iniciar sesión</a>
-      <a href={registro} class="registro">Registrarse</a>
-    </nav>
+    <div class="nav-links">
+
+      <a href={`${base}`} class="nav-link">
+        Inicio
+      </a>
+
+      <a href={`${base}catalogo/`} class="nav-link">
+        Catálogo
+      </a>
+
+      <a
+        href={`${base}login/`}
+        class="nav-link"
+        id="nav-login"
+      >
+        Iniciar sesión
+      </a>
+
+      <a
+        href={`${base}registro/`}
+        class="nav-link registro"
+        id="nav-registro"
+      >
+        Registrarse
+      </a>
+
+      <span
+        id="nav-usuario"
+        class="nav-usuario"
+        style="display:none;"
+      ></span>
+
+      <a
+        href={`${base}cuenta/`}
+        id="nav-cuenta"
+        class="nav-link"
+        style="display:none;"
+      >
+        Mi cuenta
+      </a>
+
+      <button
+        id="nav-logout"
+        class="nav-logout"
+        style="display:none;"
+      >
+        Cerrar sesión
+      </button>
+
+    </div>
   </div>
-</header>
+</nav>
+
+<script>
+  import { supabase } from "../lib/supabase.js";
+
+  const base = "/biblioschool/";
+
+  const login = document.querySelector("#nav-login");
+  const registro = document.querySelector("#nav-registro");
+  const usuario = document.querySelector("#nav-usuario");
+  const cuenta = document.querySelector("#nav-cuenta");
+  const logout = document.querySelector("#nav-logout");
+
+  function mostrarUsuario(session) {
+    if (session?.user) {
+      const datos = session.user.user_metadata || {};
+
+      const nombre =
+        datos.nombre_usuario ||
+        datos.nombre_completo ||
+        session.user.email?.split("@")[0] ||
+        "Usuario";
+
+      login.style.display = "none";
+      registro.style.display = "none";
+
+      usuario.textContent = nombre;
+      usuario.style.display = "inline-flex";
+
+      cuenta.style.display = "inline-flex";
+      logout.style.display = "inline-flex";
+    } else {
+      login.style.display = "inline-flex";
+      registro.style.display = "inline-flex";
+
+      usuario.style.display = "none";
+      cuenta.style.display = "none";
+      logout.style.display = "none";
+    }
+  }
+
+  async function iniciar() {
+    const { data } = await supabase.auth.getSession();
+    mostrarUsuario(data.session);
+  }
+
+  logout?.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    window.location.href = `${base}login/`;
+  });
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    mostrarUsuario(session);
+  });
+
+  iniciar();
+</script>
 
 <style>
   .navbar {
     width: 100%;
-    background: #f6f3ec;
-    border-bottom: 1px solid #dcd8cd;
+    background: #fffdf9;
+    border-bottom: 1px solid #e8dfd5;
     position: relative;
-    z-index: 10;
+    z-index: 20;
   }
 
-  .contenedor {
-    width: min(1200px, 100%);
+  .nav-contenido {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 20px 40px;
+    min-height: 76px;
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 30px;
+    gap: 25px;
   }
 
   .logo {
-    color: #293e33;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 25px;
-    font-weight: 400;
-    letter-spacing: -0.5px;
-  }
-
-  .logo span {
-    font-style: italic;
-  }
-
-  nav {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 10px;
+    text-decoration: none;
+    color: #302b26;
+    font-weight: 800;
+    font-size: 1.15rem;
   }
 
-  .enlace {
-    position: relative;
-    color: #4f554f;
-    font-size: 13px;
-    font-weight: 500;
-    transition: color 0.2s ease;
+  .logo-icon {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #302b26;
+    color: white;
+    font-weight: 900;
   }
 
-  .enlace::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -7px;
-    width: 0;
-    height: 1px;
-    background: #293e33;
-    transition: width 0.2s ease;
-  }
-
-  .enlace:hover {
-    color: #293e33;
-  }
-
-  .enlace:hover::after {
-    width: 100%;
-  }
-
-  .registro {
-    display: inline-flex;
+  .nav-links {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: 40px;
-    padding: 0 17px;
-    border: 1px solid #293e33;
-    color: #293e33;
-    font-size: 12px;
-    font-weight: 600;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .registro:hover {
-    background: #293e33;
-    color: #ffffff;
+  .nav-link,
+  .nav-logout {
+    text-decoration: none;
+    border: 0;
+    background: transparent;
+    color: #5f554c;
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+
+  .nav-link:hover,
+  .nav-logout:hover {
+    background: #eee7df;
+    color: #302b26;
+  }
+
+  .nav-link.registro {
+    background: #302b26;
+    color: white;
+  }
+
+  .nav-link.registro:hover {
+    background: #574b40;
+    color: white;
+  }
+
+  .nav-usuario {
+    color: #302b26;
+    font-weight: 800;
+    padding: 9px 8px;
+    font-size: 0.88rem;
   }
 
   @media (max-width: 700px) {
-    .contenedor {
-      padding: 18px 25px;
+    .nav-contenido {
       flex-direction: column;
-      align-items: center;
+      padding: 18px;
     }
 
-    nav {
-      width: 100%;
+    .nav-links {
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 18px 22px;
-    }
-  }
-
-  @media (max-width: 430px) {
-    .contenedor {
-      padding: 17px 18px;
-    }
-
-    .logo {
-      font-size: 23px;
-    }
-
-    nav {
-      gap: 14px 18px;
-    }
-
-    .enlace {
-      font-size: 12px;
-    }
-
-    .registro {
-      min-height: 36px;
-      padding: 0 13px;
     }
   }
 </style>

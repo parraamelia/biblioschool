@@ -1,0 +1,556 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { libros } from "../data/libros.js";
+import { supabase } from "../lib/supabase.js";
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+const librosDestacados = libros.slice(0, 6);
+---
+
+<Layout
+  titulo="Mejores reseñas | BiblioSchool"
+  descripcion="Descubre los libros mejor valorados por los lectores de BiblioSchool."
+>
+  <main class="resenas-page">
+
+    <section class="resenas-hero">
+      <div class="hero-content">
+        <span class="etiqueta">RESEÑAS DE LECTORES</span>
+
+        <h1>
+          Descubre los libros<br />
+          <span>mejor valorados</span>
+        </h1>
+
+        <p>
+          Mira qué libros están gustando más a nuestra comunidad de lectores.
+          Explora sus reseñas, conoce diferentes opiniones y encuentra tu
+          próxima lectura.
+        </p>
+
+        <a href={`${base}catalogo/`} class="boton-secundario">
+          Ver todo el catálogo →
+        </a>
+      </div>
+    </section>
+
+    <section class="destacados">
+      <div class="seccion-titulo">
+        <span>01</span>
+
+        <div>
+          <h2>Los favoritos de los lectores</h2>
+          <p>
+            Una selección de libros que destacan por sus buenas valoraciones.
+          </p>
+        </div>
+      </div>
+
+      <div class="libros-grid" id="libros-grid">
+
+        {
+          librosDestacados.map((libro) => (
+            <article class="libro-card" data-libro-id={libro.id}>
+
+              <div class="portada-contenedor">
+                <img
+                  src={libro.portada}
+                  alt={`Portada de ${libro.titulo}`}
+                  class="portada"
+                  loading="lazy"
+                  onerror={`this.onerror=null; this.src='${base}placeholder-libro.svg';`}
+                />
+
+                <div class="badge-rating">
+                  <span>★</span>
+                  <strong class={`promedio-${libro.id}`}>5.0</strong>
+                </div>
+              </div>
+
+              <div class="libro-info">
+
+                <span class="categoria">
+                  {libro.categoria}
+                </span>
+
+                <h3>{libro.titulo}</h3>
+
+                <p class="autor">
+                  {libro.autor}
+                </p>
+
+                <p class="resumen">
+                  {libro.resumen}
+                </p>
+
+                <div class="rating-info">
+                  <span class={`estrellas-${libro.id}`}>
+                    ★★★★★
+                  </span>
+
+                  <span class={`cantidad-${libro.id}`}>
+                    Sin reseñas todavía
+                  </span>
+                </div>
+
+                <a
+                  href={`${base}libro/${libro.id}/`}
+                  class="boton-libro"
+                >
+                  Ver libro y reseñas →
+                </a>
+
+              </div>
+            </article>
+          ))
+        }
+
+      </div>
+    </section>
+
+    <section class="como-funciona">
+      <div class="seccion-titulo">
+        <span>02</span>
+
+        <div>
+          <h2>¿Cómo funcionan las reseñas?</h2>
+          <p>
+            Tu opinión también puede ayudar a otros estudiantes a elegir qué leer.
+          </p>
+        </div>
+      </div>
+
+      <div class="pasos">
+
+        <article>
+          <div class="numero">1</div>
+          <h3>Elige un libro</h3>
+          <p>
+            Entra al catálogo y selecciona el libro que quieras conocer.
+          </p>
+        </article>
+
+        <article>
+          <div class="numero">2</div>
+          <h3>Lee las opiniones</h3>
+          <p>
+            Mira las valoraciones y comentarios que otros lectores han dejado.
+          </p>
+        </article>
+
+        <article>
+          <div class="numero">3</div>
+          <h3>Deja tu reseña</h3>
+          <p>
+            Comparte tu opinión y ayuda a otros estudiantes a descubrir buenas lecturas.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div>
+        <span>¿TODAVÍA NO SABES QUÉ LEER?</span>
+        <h2>Explora todas nuestras historias.</h2>
+      </div>
+
+      <a href={`${base}catalogo/`}>
+        Explorar catálogo →
+      </a>
+    </section>
+
+  </main>
+</Layout>
+
+<script>
+  const cargarResenas = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("reseñas_libros")
+        .select("libro_id, calificacion");
+
+      if (error) {
+        console.log("No se pudieron cargar las reseñas:", error);
+        return;
+      }
+
+      const agrupadas = {};
+
+      data?.forEach((resena) => {
+        const id = Number(resena.libro_id);
+
+        if (!agrupadas[id]) {
+          agrupadas[id] = [];
+        }
+
+        agrupadas[id].push(Number(resena.calificacion));
+      });
+
+      document.querySelectorAll(".libro-card").forEach((card) => {
+        const id = Number(card.dataset.libroId);
+        const calificaciones = agrupadas[id];
+
+        if (!calificaciones || calificaciones.length === 0) {
+          return;
+        }
+
+        const promedio =
+          calificaciones.reduce((a, b) => a + b, 0) /
+          calificaciones.length;
+
+        const promedioElemento =
+          card.querySelector(`.promedio-${id}`);
+
+        const cantidadElemento =
+          card.querySelector(`.cantidad-${id}`);
+
+        const estrellasElemento =
+          card.querySelector(`.estrellas-${id}`);
+
+        if (promedioElemento) {
+          promedioElemento.textContent = promedio.toFixed(1);
+        }
+
+        if (cantidadElemento) {
+          cantidadElemento.textContent =
+            `${calificaciones.length} ${
+              calificaciones.length === 1
+                ? "reseña"
+                : "reseñas"
+            }`;
+        }
+
+        if (estrellasElemento) {
+          const estrellas = Math.round(promedio);
+
+          estrellasElemento.textContent =
+            "★".repeat(estrellas) +
+            "☆".repeat(5 - estrellas);
+        }
+      });
+
+    } catch (error) {
+      console.log("Error cargando reseñas:", error);
+    }
+  };
+
+  cargarResenas();
+</script>
+
+<style>
+  .resenas-page {
+    min-height: 100vh;
+    background: #f7f3ea;
+  }
+
+  .resenas-hero {
+    padding: 100px 8% 80px;
+    background: #183c32;
+    color: #fff;
+  }
+
+  .hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .etiqueta {
+    display: inline-block;
+    margin-bottom: 22px;
+    padding: 8px 15px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 30px;
+    font-size: .78rem;
+    letter-spacing: 2px;
+  }
+
+  .resenas-hero h1 {
+    margin: 0;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: .98;
+    font-weight: 500;
+  }
+
+  .resenas-hero h1 span {
+    color: #d7b878;
+  }
+
+  .resenas-hero p {
+    max-width: 680px;
+    margin: 30px auto;
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,.8);
+  }
+
+  .boton-secundario {
+    display: inline-block;
+    padding: 14px 24px;
+    border: 1px solid rgba(255,255,255,.5);
+    border-radius: 30px;
+    color: #fff;
+    text-decoration: none;
+    transition: .25s;
+  }
+
+  .boton-secundario:hover {
+    background: #fff;
+    color: #183c32;
+  }
+
+  .destacados,
+  .como-funciona {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 90px 25px;
+  }
+
+  .seccion-titulo {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+    margin-bottom: 45px;
+  }
+
+  .seccion-titulo > span {
+    font-size: .9rem;
+    color: #8b7750;
+    font-weight: bold;
+    padding-top: 8px;
+  }
+
+  .seccion-titulo h2 {
+    margin: 0 0 10px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    color: #183c32;
+    font-weight: 500;
+  }
+
+  .seccion-titulo p {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+  }
+
+  .libros-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .libro-card {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e4ded2;
+    border-radius: 4px;
+    transition: transform .25s, box-shadow .25s;
+  }
+
+  .libro-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 18px 35px rgba(24,60,50,.12);
+  }
+
+  .portada-contenedor {
+    position: relative;
+    height: 350px;
+    background: #e8e2d5;
+    overflow: hidden;
+  }
+
+  .portada {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  .badge-rating {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.95);
+    color: #183c32;
+  }
+
+  .badge-rating span {
+    color: #c69d3d;
+  }
+
+  .libro-info {
+    padding: 25px;
+  }
+
+  .categoria {
+    color: #8b7750;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .libro-info h3 {
+    margin: 9px 0 5px;
+    color: #183c32;
+    font-size: 1.45rem;
+    font-weight: 500;
+  }
+
+  .autor {
+    margin: 0 0 18px;
+    color: #777;
+    font-size: .9rem;
+  }
+
+  .resumen {
+    color: #555;
+    font-size: .9rem;
+    line-height: 1.65;
+    min-height: 92px;
+  }
+
+  .rating-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    margin-top: 15px;
+  }
+
+  .rating-info span:first-child {
+    color: #c69d3d;
+    letter-spacing: 2px;
+  }
+
+  .rating-info span:last-child {
+    color: #777;
+    font-size: .8rem;
+  }
+
+  .boton-libro {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background: #183c32;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+    transition: .2s;
+  }
+
+  .boton-libro:hover {
+    background: #275849;
+  }
+
+  .como-funciona {
+    padding-top: 20px;
+  }
+
+  .pasos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+  }
+
+  .pasos article {
+    padding: 30px;
+    background: #ebe5d8;
+  }
+
+  .numero {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: #183c32;
+    color: white;
+  }
+
+  .pasos h3 {
+    color: #183c32;
+    font-size: 1.2rem;
+  }
+
+  .pasos p {
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .final-cta {
+    max-width: 1250px;
+    margin: 0 auto 70px;
+    padding: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    background: #d7b878;
+    color: #183c32;
+  }
+
+  .final-cta span {
+    font-size: .75rem;
+    letter-spacing: 2px;
+  }
+
+  .final-cta h2 {
+    margin: 8px 0 0;
+    font-size: 2rem;
+    font-weight: 500;
+  }
+
+  .final-cta a {
+    padding: 14px 22px;
+    background: #183c32;
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .libros-grid,
+    .pasos {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .resenas-hero {
+      padding: 70px 20px;
+    }
+
+    .destacados,
+    .como-funciona {
+      padding: 60px 20px;
+    }
+
+    .libros-grid,
+    .pasos {
+      grid-template-columns: 1fr;
+    }
+
+    .final-cta {
+      margin: 0 20px 50px;
+      padding: 30px;
+      display: block;
+    }
+
+    .final-cta a {
+      display: inline-block;
+      margin-top: 25px;
+    }
+  }
+</style>
